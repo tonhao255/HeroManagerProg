@@ -1,2 +1,3 @@
-# HeroManagerProg
-prog projeto de manager de heroes
+Turma: 301-INFO
+
+Alunos: Lucas Salvador, Antonio Henrique Rohling Froehner
