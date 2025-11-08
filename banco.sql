@@ -45,7 +45,6 @@ CREATE TABLE herois (
     id_heroi INT AUTO_INCREMENT PRIMARY KEY,
     nome_heroi VARCHAR(100) NOT NULL,
     id_classe INT NOT NULL,
-    nivel INT NOT NULL DEFAULT 1,
     imagem_url VARCHAR(255),
     habilidades TEXT,
     forca INT NOT NULL DEFAULT 10,
@@ -53,8 +52,8 @@ CREATE TABLE herois (
     velocidade INT NOT NULL DEFAULT 10,
     id_time INT NOT NULL,
     data_criacao TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-    classe_ranking ENUM('S', 'A', 'B', 'C', 'D') DEFAULT 'C',
-    posicao_ranking INT DEFAULT NULL,
+    rank ENUM('S', 'A', 'B', 'C', 'D') DEFAULT 'D',
+    posicao INT DEFAULT NULL,
     
     FOREIGN KEY (id_classe) REFERENCES classes(id_classe)
         ON DELETE RESTRICT,

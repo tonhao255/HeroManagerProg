@@ -1,7 +1,6 @@
-#}>===-------===<:/%@@%/:>===-------===<{#
-#|              IMPORTAÇÃO              |#
-#}>===-------===<:/%@@%/:>===-------===<{#
-# region
+#\._
+#)%#}>--==<:/%@@%/:>===-------===<{#
+# region IMPORTAÇÃO
 
 from flask import Flask, render_template, redirect, url_for, request, session, flash, Blueprint
 from functools import wraps
@@ -10,8 +9,8 @@ import mysql.connector
 from mysql.connector import Error
 
 # endregion
-
-
+#)%#}>--==<:/%@@%/:>===-------===<{#
+#\._
 
 #}>===-------===<:/%@@%/:>===-------===<{#
 #|             CONFIGURAÇÃO             |#
@@ -19,7 +18,7 @@ from mysql.connector import Error
 # region
 
 app = Flask(__name__)
-app.secret_key = 'chave-muito-secreta'
+app.secret_key = 'chave-secreta-muito-segura-para-seu-projeto'
 
 db_config = {
     'host': 'localhost',
@@ -48,20 +47,75 @@ def get_connection():
 def admin_required(f):
     @wraps(f)
     def wrapper(*args, **kwargs):
-        if 'usuario_id' not in session or session.get('tipo_usuario') != 'ADMIN':
+        if 'id_usuario' not in session or session.get('tipo_usuario') != 'ADMIN':
             flash('Acesso restrito a administradores.', 'erro')
-            return redirect(url_for('dashboard'))
+            return redirect(url_for('index'))
         return f(*args, **kwargs)
     return wrapper
 
 def login_required(f):
     @wraps(f)
     def wrapper(*args, **kwargs):
-        if 'usuario_id' not in session:
+        if 'id_usuario' not in session:
             flash('Faça login para acessar o painel.', 'erro')
             return redirect(url_for('login'))
         return f(*args, **kwargs)
     return wrapper
+
+def team_required(f):
+    @wraps(f)
+    @login_required
+    def decorated_function(*args, **kwargs):
+        tipo_usuario = session.get('tipo_usuario')
+        id_usuario = session.get('id_usuario')
+        id_time = kwargs.get('id_time')
+
+        if tipo_usuario == 'ADMIN':
+            return f(*args, **kwargs)
+
+        conn = get_connection()
+        cursor = conn.cursor(dictionary=True)
+        cursor.execute("SELECT id_usuario FROM times WHERE id_time = %s", (id_time,))
+        dono_time = cursor.fetchone()
+        cursor.close()
+        conn.close()
+
+        if not dono_time or dono_time['id_usuario'] != id_usuario:
+            flash("Você não tem permissão para alterar este time.", "erro")
+            return redirect(url_for('index'))
+
+        return f(*args, **kwargs)
+    return decorated_function
+
+def hero_required(f):
+    @wraps(f)
+    @login_required
+    def decorated_function(*args, **kwargs):
+        tipo_usuario = session.get('tipo_usuario')
+        id_usuario = session.get('id_usuario')
+        id_heroi = kwargs.get('id_heroi')
+
+        if tipo_usuario == 'ADMIN':
+            return f(*args, **kwargs)
+
+        conn = get_connection()
+        cursor = conn.cursor(dictionary=True)
+
+        cursor.execute("SELECT id_time FROM herois WHERE id_heroi = %s", (id_heroi,))
+        heroi = cursor.fetchone()
+
+        cursor.execute("SELECT id_time FROM times WHERE id_usuario = %s", (id_usuario,))
+        time_usuario = cursor.fetchone()
+
+        cursor.close()
+        conn.close()
+
+        if not heroi or not time_usuario or heroi['id_time'] != time_usuario['id_time']:
+            flash("Você não tem permissão para alterar este herói.", "erro")
+            return redirect(url_for('index'))
+
+        return f(*args, **kwargs)
+    return decorated_function
 
 # endregion
 
@@ -81,20 +135,20 @@ def listar_herois():
     conn = get_connection()
     cursor = conn.cursor(dictionary=True)
     cursor.execute("""
-        SELECT 
+        SELECT
             h.id_heroi,
             h.nome_heroi,
-            h.nivel,
             h.forca,
             h.defesa,
             h.velocidade,
+            h.rank,
+            h.posicao,
             c.nome_classe AS classe,
             t.nome_time AS time
         FROM herois h
         JOIN classes c ON h.id_classe = c.id_classe
         JOIN times t ON h.id_time = t.id_time
-        ORDER BY c.nome_classe, h.id_heroi;
-    """)
+        ORDER BY c.nome_classe, h.rank DESC, h.posicao ASC, h.id_heroi;""")
     herois = cursor.fetchall()
     cursor.close()
     conn.close()
@@ -174,7 +228,7 @@ def login():
         conn.close()
 
         if user and check_password_hash(user['senha_hash'], senha):
-            session['usuario_id'] = user['id_usuario']
+            session['id_usuario'] = user['id_usuario']
             session['tipo_usuario'] = user['tipo']
             session['nome_usuario'] = user['nome_usuario']
             return redirect(url_for('index'))
@@ -291,15 +345,145 @@ def logout():
 
 
 #}>===-------===<:/%@@%/:>===-------===<{#
-#|             ROTAS EDITAR             |#
+#|              ROTAS CRUD              |#
 #}>===-------===<:/%@@%/:>===-------===<{#
 # region
 
+@app.route('/heroi/novo', methods=['GET', 'POST'])
+@login_required
+def adicionar_heroi():
+    conn = get_connection()
+    cursor = conn.cursor(dictionary=True)
 
+    cursor.execute("SELECT id_classe, nome_classe FROM classes ORDER BY nome_classe")
+    classes = cursor.fetchall()
+
+    tipo_usuario = session.get('tipo_usuario')
+    
+    times = []
+    if tipo_usuario == 'ADMIN':
+        cursor.execute("SELECT id_time, nome_time FROM times ORDER BY nome_time")
+        times = cursor.fetchall()
+
+    form = {}
+    
+    if request.method == 'POST':
+        form['nome_heroi'] = request.form['nome_heroi'].strip()
+        form['id_classe'] = request.form['id_classe']
+        form['imagem_url'] = request.form['imagem_url'].strip()
+        form['habilidades'] = request.form['habilidades'].strip()
+        form['forca'] = request.form['forca']
+        form['defesa'] = request.form['defesa']
+        form['velocidade'] = request.form['velocidade']
+
+        if tipo_usuario == 'ADMIN':
+            form['id_time'] = request.form['id_time']
+        else:
+            form['id_time'] = session.get('id_time')
+
+        cursor.execute("SELECT id_heroi FROM herois WHERE nome_heroi = %s", (form['nome_heroi'],))
+        if cursor.fetchone():
+            flash("Já existe um herói com esse nome!", "warning")
+        else:
+            cursor.execute("""SELECT MAX(posicao_ranking) AS ultima_pos
+                FROM herois
+                WHERE rank = 'D'""")
+            ultima_pos = cursor.fetchone()['ultima_pos'] or 0
+            nova_posicao = ultima_pos + 1
+
+            cursor.execute("""
+                INSERT INTO herois
+                (nome_heroi, id_classe, imagem_url, habilidades, forca, defesa, velocidade, id_time, posicao)
+                VALUES
+                (%s, %s, %s, %s, %s, %s, %s, %s, %s)""", 
+                (form['nome_heroi'], form['id_classe'], form['imagem_url'], form['habilidades'], form['forca'], form['defesa'], form['velocidade'], form['id_time'], nova_posicao)
+            )
+            conn.commit()
+
+            novo_id = cursor.lastrowid
+
+            cursor.close()
+            conn.close()
+            return redirect(url_for('ver_heroi', id_heroi=novo_id))
+
+    cursor.close()
+    conn.close()
+    return render_template('adicionar_heroi.html', form=form, classes=classes, times=times)
+
+@app.route('/heroi/<int:id_heroi>/editar', methods=['GET', 'POST'])
+@hero_required
+def editar_heroi(id_heroi):
+    conn = get_connection()
+    cursor = conn.cursor(dictionary=True)
+
+    cursor.execute("""
+        SELECT h.*, t.nome_time
+        FROM herois h
+        JOIN times t ON t.id_time = h.id_time
+        WHERE h.id_heroi = %s
+    """, (id_heroi,))
+    heroi_original = cursor.fetchone()
+
+    if not heroi_original:
+        cursor.close()
+        conn.close()
+        flash("Herói não encontrado.", "erro")
+        return redirect(url_for('index'))
+
+    cursor.execute("SELECT id_classe, nome_classe FROM classes ORDER BY nome_classe")
+    classes = cursor.fetchall()
+
+    tipo_usuario = session.get('tipo_usuario')
+
+    times = []
+    if tipo_usuario == 'ADMIN':
+        cursor.execute("SELECT id_time, nome_time FROM times ORDER BY nome_time")
+        times = cursor.fetchall()
+
+    form = dict(heroi_original)
+
+    if request.method == 'POST':
+        form['nome_heroi'] = request.form.get('nome_heroi', '').strip()
+        form['id_classe'] = request.form.get('id_classe')
+        form['imagem_url'] = request.form.get('imagem_url', '').strip()
+        form['habilidades'] = request.form.get('habilidades', '').strip()
+        form['forca'] = request.form.get('forca')
+        form['defesa'] = request.form.get('defesa')
+        form['velocidade'] = request.form.get('velocidade')
+
+        if tipo_usuario == 'ADMIN':
+            form['id_time'] = request.form['id_time']
+            form['rank'] = request.form.get('rank', 'D')
+        else:
+            form['id_time'] = session.get('id_time')
+
+        cursor.execute("""
+            SELECT id_heroi FROM herois WHERE nome_heroi = %s AND id_heroi <> %s""",
+            (form['nome_heroi'], id_heroi)
+        )
+        if cursor.fetchone():
+            flash("Já existe um herói com esse nome!", "warning")
+        else:
+            cursor.execute("""
+                UPDATE herois
+                SET nome_heroi=%s, id_classe=%s, imagem_url=%s, habilidades=%s, forca=%s, defesa=%s, velocidade=%s, id_time=%s, rank=%s
+                WHERE id_heroi = %s""", 
+                (form['nome_heroi'], form['id_classe'], form['imagem_url'], form['habilidades'], form['forca'], form['defesa'], form['velocidade'], form['id_time'], form['classe_ranking'], id_heroi)
+            )
+            conn.commit()
+            cursor.close()
+            conn.close()
+            return redirect(url_for('ver_heroi', id_heroi=id_heroi))
+
+    cursor.close()
+    conn.close()
+    return render_template('editar_heroi.html', form=form, classes=classes, times=times)
 
 #endregion
 
 
+
+# region Comentado
 # # ==============================================================
 # # LOGIN / CADASTRO / LOGOUT
 # # ==============================================================
@@ -318,7 +502,7 @@ def logout():
 #         conn.close()
 
 #         if user and check_password_hash(user['senha_hash'], senha):
-#             session['usuario_id'] = user['id_usuario']
+#             session['id_usuario'] = user['id_usuario']
 #             session['tipo_usuario'] = user['tipo']
 #             session['nome_usuario'] = user['nome_usuario']
 #             return redirect(url_for('dashboard'))
@@ -490,7 +674,7 @@ def logout():
 # @app.route('/dashboard')
 # @login_required
 # def dashboard_time():
-#     usuario_id = session.get('usuario_id')
+#     id_usuario = session.get('id_usuario')
 #     tipo = session.get('tipo_usuario')
 
 #     # Evita que o admin acesse esta rota
@@ -500,7 +684,7 @@ def logout():
 
 #     conn = get_db_connection()
 #     cursor = conn.cursor(dictionary=True)
-#     cursor.execute("SELECT * FROM times WHERE id_usuario = %s", (usuario_id,))
+#     cursor.execute("SELECT * FROM times WHERE id_usuario = %s", (id_usuario,))
 #     time = cursor.fetchone()
 #     cursor.execute("SELECT * FROM herois WHERE id_time = %s ORDER BY id_heroi", (time['id_time'],))
 #     herois = cursor.fetchall()
@@ -508,6 +692,7 @@ def logout():
 #     conn.close()
 
 #     return render_template('dashboard_time.html', time=time, herois=herois)
+#endregion
 
 
 #}>===-------===<:/%@@%/:>===-------===<{#
