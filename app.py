@@ -1,5 +1,18 @@
-#\._
-#)%#}>--==<:/%@@%/:>===-------===<{#
+# .-.  .
+# @  )  )
+#.>.= .'\
+#:/  -}=--=<{%@%}>====-------
+# region TESTE
+#:\  -}====-------
+# /'
+
+
+
+
+# .-.  .
+# @  )  )
+#.>.= .'\
+#:/  -}=--=<{%@%}>====-------
 # region IMPORTAÇÃO
 
 from flask import Flask, render_template, redirect, url_for, request, session, flash, Blueprint
@@ -9,13 +22,16 @@ import mysql.connector
 from mysql.connector import Error
 
 # endregion
-#)%#}>--==<:/%@@%/:>===-------===<{#
-#\._
+#:\  -}====-------
+# /'
 
-#}>===-------===<:/%@@%/:>===-------===<{#
-#|             CONFIGURAÇÃO             |#
-#}>===-------===<:/%@@%/:>===-------===<{#
-# region
+
+
+# .-.  .
+# @  )  )
+#.>.= .'\
+#:/  -}=--=<{%@%}>====-------
+# region CONFIGURAÇÃO
 
 app = Flask(__name__)
 app.secret_key = 'chave-secreta-muito-segura-para-seu-projeto'
@@ -36,13 +52,16 @@ def get_connection():
         return None
 
 # endregion
+#:\  -}====-------
+# /'
 
 
 
-#}>===-------===<:/%@@%/:>===-------===<{#
-#|              DECORATORS              |#
-#}>===-------===<:/%@@%/:>===-------===<{#
-# region
+# .-.  .
+# @  )  )
+#.>.= .'\
+#:/  -}=--=<{%@%}>====-------
+# region DECORATORS
 
 def admin_required(f):
     @wraps(f)
@@ -118,13 +137,16 @@ def hero_required(f):
     return decorated_function
 
 # endregion
+#:\  -}====-------
+# /'
 
 
 
-#}>===-------===<:/%@@%/:>===-------===<{#
-#|            ROTAS LISTAGEM            |#
-#}>===-------===<:/%@@%/:>===-------===<{#
-# region
+# .-.  .
+# @  )  )
+#.>.= .'\
+#:/  -}=--=<{%@%}>====-------
+# region ROTAS LISTAGEM
 
 @app.route('/')
 def index():
@@ -206,13 +228,16 @@ def ver_time(id_time):
     return render_template('ver_time.html', time=time, herois=herois)
 
 # endregion
+#:\  -}====-------
+# /'
 
 
 
-#}>===-------===<:/%@@%/:>===-------===<{#
-#|              ROTAS LOGIN             |#
-#}>===-------===<:/%@@%/:>===-------===<{#
-# region
+# .-.  .
+# @  )  )
+#.>.= .'\
+#:/  -}=--=<{%@%}>====-------
+# region ROTAS LOGIN
 
 @app.route('/login', methods=['GET', 'POST'])
 def login():
@@ -341,13 +366,16 @@ def logout():
     return redirect(url_for('index'))
 
 #endregion
+#:\  -}====-------
+# /'
 
 
 
-#}>===-------===<:/%@@%/:>===-------===<{#
-#|              ROTAS CRUD              |#
-#}>===-------===<:/%@@%/:>===-------===<{#
-# region
+# .-.  .
+# @  )  )
+#.>.= .'\
+#:/  -}=--=<{%@%}>====-------
+# region ROTAS CRUD
 
 @app.route('/heroi/novo', methods=['GET', 'POST'])
 @login_required
@@ -480,9 +508,15 @@ def editar_heroi(id_heroi):
     return render_template('editar_heroi.html', form=form, classes=classes, times=times)
 
 #endregion
+#:\  -}====-------
+# /'
 
 
 
+# .-.  .
+# @  )  )
+#.>.= .'\
+#:/  -}=--=<{%@%}>====-------
 # region Comentado
 # # ==============================================================
 # # LOGIN / CADASTRO / LOGOUT
@@ -693,14 +727,20 @@ def editar_heroi(id_heroi):
 
 #     return render_template('dashboard_time.html', time=time, herois=herois)
 #endregion
+#:\  -}====-------
+# /'
 
 
-#}>===-------===<:/%@@%/:>===-------===<{#
-#|               EXECUÇÃO               |#
-#}>===-------===<:/%@@%/:>===-------===<{#
-# region
+
+# .-.  .
+# @  )  )
+#.>.= .'\
+#:/  -}=--=<{%@%}>====-------
+# region EXECUÇÃO
 
 if __name__ == '__main__':
     app.run(debug=True)
 
 # endregion
+#:\  -}====-------
+# /'
