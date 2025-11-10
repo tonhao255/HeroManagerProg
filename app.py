@@ -9,10 +9,7 @@
 
 
 
-# .-.  .
-# @  )  )
-#.>.= .'\
-#:/  -}=--=<{%@%}>====-------
+# {}
 # region IMPORTAÇÃO
 
 from flask import Flask, render_template, redirect, url_for, request, session, flash, Blueprint
@@ -22,15 +19,11 @@ import mysql.connector
 from mysql.connector import Error
 
 # endregion
-#:\  -}====-------
-# /'
+# {-}
 
 
 
-# .-.  .
-# @  )  )
-#.>.= .'\
-#:/  -}=--=<{%@%}>====-------
+# {}
 # region CONFIGURAÇÃO
 
 app = Flask(__name__)
@@ -52,15 +45,11 @@ def get_connection():
         return None
 
 # endregion
-#:\  -}====-------
-# /'
+# {-}
 
 
 
-# .-.  .
-# @  )  )
-#.>.= .'\
-#:/  -}=--=<{%@%}>====-------
+# {}
 # region DECORATORS
 
 def admin_required(f):
@@ -137,15 +126,11 @@ def hero_required(f):
     return decorated_function
 
 # endregion
-#:\  -}====-------
-# /'
+# {-}
 
 
 
-# .-.  .
-# @  )  )
-#.>.= .'\
-#:/  -}=--=<{%@%}>====-------
+# {}
 # region ROTAS LISTAGEM
 
 @app.route('/')
@@ -228,15 +213,11 @@ def ver_time(id_time):
     return render_template('ver_time.html', time=time, herois=herois)
 
 # endregion
-#:\  -}====-------
-# /'
+# {-}
 
 
 
-# .-.  .
-# @  )  )
-#.>.= .'\
-#:/  -}=--=<{%@%}>====-------
+# {}
 # region ROTAS LOGIN
 
 @app.route('/login', methods=['GET', 'POST'])
@@ -366,15 +347,11 @@ def logout():
     return redirect(url_for('index'))
 
 #endregion
-#:\  -}====-------
-# /'
+# {-}
 
 
 
-# .-.  .
-# @  )  )
-#.>.= .'\
-#:/  -}=--=<{%@%}>====-------
+# {}
 # region ROTAS CRUD
 
 @app.route('/heroi/novo', methods=['GET', 'POST'])
@@ -507,16 +484,45 @@ def editar_heroi(id_heroi):
     conn.close()
     return render_template('editar_heroi.html', form=form, classes=classes, times=times)
 
+@app.route('/heroi/<int:id_heroi>/excluir', methods=['GET', 'POST'])
+@hero_required
+def excluir_heroi(id_heroi):
+    conn = get_connection()
+    cursor = conn.cursor(dictionary=True)
+
+    cursor.execute("""
+        SELECT h.*, t.nome_time
+        FROM herois h
+        JOIN times t ON t.id_time = h.id_time
+        WHERE h.id_heroi = %s
+    """, (id_heroi,))
+    heroi = cursor.fetchone()
+
+    if not heroi:
+        cursor.close()
+        conn.close()
+        flash("Herói não encontrado.", "erro")
+        return redirect(url_for('index'))
+    
+    if request.method == 'POST':
+        cursor.execute('DELETE FROM herois WHERE id_heroi = %s', (id_heroi))
+        conn.commit()
+        return redirect(url_for('ver_time', id_time=heroi.get('id_time')))
+    
+    cursor.close()
+    conn.close()
+    return render_template('exclui_heroi', id_heroi=id_heroi)
+    
+    
+
+
+
 #endregion
-#:\  -}====-------
-# /'
+# {-}
 
 
 
-# .-.  .
-# @  )  )
-#.>.= .'\
-#:/  -}=--=<{%@%}>====-------
+# {}
 # region Comentado
 # # ==============================================================
 # # LOGIN / CADASTRO / LOGOUT
@@ -727,20 +733,15 @@ def editar_heroi(id_heroi):
 
 #     return render_template('dashboard_time.html', time=time, herois=herois)
 #endregion
-#:\  -}====-------
-# /'
+# {-}
 
 
 
-# .-.  .
-# @  )  )
-#.>.= .'\
-#:/  -}=--=<{%@%}>====-------
+# {}
 # region EXECUÇÃO
 
 if __name__ == '__main__':
     app.run(debug=True)
 
 # endregion
-#:\  -}====-------
-# /'
+# {-}
