@@ -6,10 +6,23 @@
 #:\  -}====-------
 # /'
 
+# \.
+# .'¨¨'.
+#/  _   \    `;
+# .' '  /,   ,¨'-
+#/'.__.'__'__'._____('________ ____
+#
+# region TESTE
+# ._____ ____._______
+#(  .       (
+# '-'        '
 
-
-
-# {}
+# \.
+# .'¨¨'.
+#/  _   \    `;
+# .' '  /,   ,¨'-
+#/'.__.'__'__'._____('________ ____
+#
 # region IMPORTAÇÃO
 
 from flask import Flask, render_template, redirect, url_for, request, session, flash, Blueprint
@@ -19,11 +32,18 @@ import mysql.connector
 from mysql.connector import Error
 
 # endregion
-# {-}
+# ._____ ____._______
+#(  .       (
+# '-'        '
 
 
 
-# {}
+# \.
+# .'¨¨'.
+#/  _   \    `;
+# .' '  /,   ,¨'-
+#/'.__.'__'__'._____('________ ____
+#
 # region CONFIGURAÇÃO
 
 app = Flask(__name__)
@@ -45,11 +65,18 @@ def get_connection():
         return None
 
 # endregion
-# {-}
+# ._____ ____._______
+#(  .       (
+# '-'        '
 
 
 
-# {}
+# \.
+# .'¨¨'.
+#/  _   \    `;
+# .' '  /,   ,¨'-
+#/'.__.'__'__'._____('________ ____
+#
 # region DECORATORS
 
 def admin_required(f):
@@ -126,11 +153,18 @@ def hero_required(f):
     return decorated_function
 
 # endregion
-# {-}
+# ._____ ____._______
+#(  .       (
+# '-'        '
 
 
 
-# {}
+# \.
+# .'¨¨'.
+#/  _   \    `;
+# .' '  /,   ,¨'-
+#/'.__.'__'__'._____('________ ____
+#
 # region ROTAS LISTAGEM
 
 @app.route('/')
@@ -213,11 +247,18 @@ def ver_time(id_time):
     return render_template('ver_time.html', time=time, herois=herois)
 
 # endregion
-# {-}
+# ._____ ____._______
+#(  .       (
+# '-'        '
 
 
 
-# {}
+# \.
+# .'¨¨'.
+#/  _   \    `;
+# .' '  /,   ,¨'-
+#/'.__.'__'__'._____('________ ____
+#
 # region ROTAS LOGIN
 
 @app.route('/login', methods=['GET', 'POST'])
@@ -347,11 +388,18 @@ def logout():
     return redirect(url_for('index'))
 
 #endregion
-# {-}
+# ._____ ____._______
+#(  .       (
+# '-'        '
 
 
 
-# {}
+# \.
+# .'¨¨'.
+#/  _   \    `;
+# .' '  /,   ,¨'-
+#/'.__.'__'__'._____('________ ____
+#
 # region ROTAS CRUD
 
 @app.route('/heroi/novo', methods=['GET', 'POST'])
@@ -512,17 +560,20 @@ def excluir_heroi(id_heroi):
     cursor.close()
     conn.close()
     return render_template('exclui_heroi', id_heroi=id_heroi)
-    
-    
-
-
 
 #endregion
-# {-}
+# ._____ ____._______
+#(  .       (
+# '-'        '
 
 
 
-# {}
+# \.
+# .'¨¨'.
+#/  _   \    `;
+# .' '  /,   ,¨'-
+#/'.__.'__'__'._____('________ ____
+#
 # region Comentado
 # # ==============================================================
 # # LOGIN / CADASTRO / LOGOUT
@@ -733,15 +784,24 @@ def excluir_heroi(id_heroi):
 
 #     return render_template('dashboard_time.html', time=time, herois=herois)
 #endregion
-# {-}
+# ._____ ____._______
+#(  .       (
+# '-'        '
 
 
 
-# {}
+# \.
+# .'¨¨'.
+#/  _   \    `;
+# .' '  /,   ,¨'-
+#/'.__.'__'__'._____('________ ____
+#
 # region EXECUÇÃO
 
 if __name__ == '__main__':
     app.run(debug=True)
 
 # endregion
-# {-}
+# ._____ ____._______
+#(  .       (
+# '-'        '
