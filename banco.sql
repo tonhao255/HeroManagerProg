@@ -1,12 +1,12 @@
---#}>===-------===<:/%@@%/:>===-------===<{#--
---#|             CRIAÇÃO DO DB            |#--
---#}>===-------===<:/%@@%/:>===-------===<{#--
+--}>===-------===<:/%@@%/:>===-------===<{--
+--|             CRIAÇÃO DO DB            |--
+--}>===-------===<:/%@@%/:>===-------===<{--
 CREATE DATABASE sistema_herois;
 USE sistema_herois;
 
---#}>===-------===<:/%@@%/:>===-------===<{#--
---#|       USUÁRIOS (ADMINS E TIMES)      |#--
---#}>===-------===<:/%@@%/:>===-------===<{#--
+--}>===-------===<:/%@@%/:>===-------===<{--
+--|       USUÁRIOS (ADMINS E TIMES)      |--
+--}>===-------===<:/%@@%/:>===-------===<{--
 CREATE TABLE usuarios (
     id_usuario INT AUTO_INCREMENT PRIMARY KEY,
     nome_usuario VARCHAR(100) NOT NULL,
@@ -16,9 +16,9 @@ CREATE TABLE usuarios (
     data_criacao TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 );
 
---#}>===-------===<:/%@@%/:>===-------===<{#--
---#|                 TIMES                |#--
---#}>===-------===<:/%@@%/:>===-------===<{#--
+--}>===-------===<:/%@@%/:>===-------===<{--
+--|                 TIMES                |--
+--}>===-------===<:/%@@%/:>===-------===<{--
 CREATE TABLE times (
     id_time INT AUTO_INCREMENT PRIMARY KEY,
     nome_time VARCHAR(100) NOT NULL UNIQUE,
@@ -29,18 +29,18 @@ CREATE TABLE times (
         ON DELETE CASCADE
 );
 
---#}>===-------===<:/%@@%/:>===-------===<{#--
---#|           CLASSES DE HERÓIS          |#--
---#}>===-------===<:/%@@%/:>===-------===<{#--
+--}>===-------===<:/%@@%/:>===-------===<{--
+--|           CLASSES DE HERÓIS          |--
+--}>===-------===<:/%@@%/:>===-------===<{--
 CREATE TABLE classes (
     id_classe INT AUTO_INCREMENT PRIMARY KEY,
     nome_classe VARCHAR(100) NOT NULL UNIQUE,
     descricao TEXT
 );
 
---#}>===-------===<:/%@@%/:>===-------===<{#--
---#|                HERÓIS                |#--
---#}>===-------===<:/%@@%/:>===-------===<{#--
+--}>===-------===<:/%@@%/:>===-------===<{--
+--|                HERÓIS                |--
+--}>===-------===<:/%@@%/:>===-------===<{--
 CREATE TABLE herois (
     id_heroi INT AUTO_INCREMENT PRIMARY KEY,
     nome_heroi VARCHAR(100) NOT NULL,

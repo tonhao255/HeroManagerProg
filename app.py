@@ -1,18 +1,24 @@
-# .-.  .
-# @  )  )
-#.>.= .'\
-#:/  -}=--=<{%@%}>====-------
+# \.
+# .'¨¨¨'.
+#/  __   \    `;
+# .' .'  /,   ,¨'-
+#/'.___.'__'__'._____('________ ____
+#
 # region TESTE
-#:\  -}====-------
-# /'
+
+# endregion
+# ._____ ____._______
+#(  .       (
+# '-'        '
 
 
 
-
-# .-.  .
-# @  )  )
-#.>.= .'\
-#:/  -}=--=<{%@%}>====-------
+# \.
+# .'¨¨¨'.
+#/  __   \    `;
+# .' .'  /,   ,¨'-
+#/'.___.'__'__'._____('________ ____
+#
 # region IMPORTAÇÃO
 
 from flask import Flask, render_template, redirect, url_for, request, session, flash, Blueprint
@@ -22,15 +28,18 @@ import mysql.connector
 from mysql.connector import Error
 
 # endregion
-#:\  -}====-------
-# /'
+# ._____ ____._______
+#(  .       (
+# '-'        '
 
 
 
-# .-.  .
-# @  )  )
-#.>.= .'\
-#:/  -}=--=<{%@%}>====-------
+# \.
+# .'¨¨¨'.
+#/  __   \    `;
+# .' .'  /,   ,¨'-
+#/'.___.'__'__'._____('________ ____
+#
 # region CONFIGURAÇÃO
 
 app = Flask(__name__)
@@ -52,15 +61,18 @@ def get_connection():
         return None
 
 # endregion
-#:\  -}====-------
-# /'
+# ._____ ____._______
+#(  .       (
+# '-'        '
 
 
 
-# .-.  .
-# @  )  )
-#.>.= .'\
-#:/  -}=--=<{%@%}>====-------
+# \.
+# .'¨¨¨'.
+#/  __   \    `;
+# .' .'  /,   ,¨'-
+#/'.___.'__'__'._____('________ ____
+#
 # region DECORATORS
 
 def admin_required(f):
@@ -137,20 +149,25 @@ def hero_required(f):
     return decorated_function
 
 # endregion
-#:\  -}====-------
-# /'
+# ._____ ____._______
+#(  .       (
+# '-'        '
 
 
 
-# .-.  .
-# @  )  )
-#.>.= .'\
-#:/  -}=--=<{%@%}>====-------
+# \.
+# .'¨¨¨'.
+#/  __   \    `;
+# .' .'  /,   ,¨'-
+#/'.___.'__'__'._____('________ ____
+#
 # region ROTAS LISTAGEM
 
 @app.route('/')
 def index():
     return render_template('index.html')
+
+# region HEROI
 
 @app.route('/herois', methods=['GET'])
 def listar_herois():
@@ -176,6 +193,26 @@ def listar_herois():
     conn.close()
     return render_template('herois.html', herois)
 
+@app.route('/heroi/<int:id_heroi>', methods=['GET'])
+def ver_heroi(id_heroi):
+    conn = get_connection()
+    cursor = conn.cursor(dictionary=True)
+    cursor.execute("""
+        SELECT h.*, t.nome_time
+        FROM herois h
+        JOIN times t ON t.id_time = h.id_time
+        WHERE h.id_heroi = %s
+    """, (id_heroi,))
+    heroi = cursor.fetchone()
+    cursor.close()
+    conn.close()
+
+    return render_template('ver_heroi.html', heroi=heroi)
+
+# endregion
+
+# region TIME
+
 @app.route('/times', methods=['GET'])
 def listar_times():
     conn = get_connection()
@@ -199,22 +236,6 @@ def listar_times():
 
     return render_template('times.html', times)
 
-@app.route('/heroi/<int:id_heroi>', methods=['GET'])
-def ver_heroi(id_heroi):
-    conn = get_connection()
-    cursor = conn.cursor(dictionary=True)
-    cursor.execute("""
-        SELECT h.*, t.nome_time
-        FROM herois h
-        JOIN times t ON t.id_time = h.id_time
-        WHERE h.id_heroi = %s
-    """, (id_heroi,))
-    heroi = cursor.fetchone()
-    cursor.close()
-    conn.close()
-
-    return render_template('ver_heroi.html', heroi=heroi)
-
 @app.route('/time/<int:id_time>', methods=['GET'])
 def ver_time(id_time):
     conn = get_connection()
@@ -228,15 +249,38 @@ def ver_time(id_time):
     return render_template('ver_time.html', time=time, herois=herois)
 
 # endregion
-#:\  -}====-------
-# /'
+
+# region CLASSE
+
+@app.route('/classes', methods=['GET'])
+@admin_required
+def listar_classes():
+    conn = get_connection()
+    cursor = conn.cursor(dictionary=True)
+    cursor.execute("""
+        SELECT * FROM classes
+    """)
+    classes = cursor.fetchall()
+    cursor.close
+    conn.close()
+    
+    return render_template('classes.html', classes=classes)
+
+# endregion
+
+# endregion
+# ._____ ____._______
+#(  .       (
+# '-'        '
 
 
 
-# .-.  .
-# @  )  )
-#.>.= .'\
-#:/  -}=--=<{%@%}>====-------
+# \.
+# .'¨¨¨'.
+#/  __   \    `;
+# .' .'  /,   ,¨'-
+#/'.___.'__'__'._____('________ ____
+#
 # region ROTAS LOGIN
 
 @app.route('/login', methods=['GET', 'POST'])
@@ -365,17 +409,22 @@ def logout():
     flash('Sessão encerrada.', 'info')
     return redirect(url_for('index'))
 
-#endregion
-#:\  -}====-------
-# /'
+# endregion
+# ._____ ____._______
+#(  .       (
+# '-'        '
 
 
 
-# .-.  .
-# @  )  )
-#.>.= .'\
-#:/  -}=--=<{%@%}>====-------
+# \.
+# .'¨¨¨'.
+#/  __   \    `;
+# .' .'  /,   ,¨'-
+#/'.___.'__'__'._____('________ ____
+#
 # region ROTAS CRUD
+
+# region HEROI
 
 @app.route('/heroi/novo', methods=['GET', 'POST'])
 @login_required
@@ -432,6 +481,7 @@ def adicionar_heroi():
 
             cursor.close()
             conn.close()
+            flash("Herói adicionado com sucesso!", "sucesso")
             return redirect(url_for('ver_heroi', id_heroi=novo_id))
 
     cursor.close()
@@ -501,23 +551,341 @@ def editar_heroi(id_heroi):
             conn.commit()
             cursor.close()
             conn.close()
+            flash("Herói editado com sucesso!", "sucesso")
             return redirect(url_for('ver_heroi', id_heroi=id_heroi))
 
     cursor.close()
     conn.close()
     return render_template('editar_heroi.html', form=form, classes=classes, times=times)
 
-#endregion
-#:\  -}====-------
-# /'
+@app.route('/heroi/<int:id_heroi>/excluir', methods=['GET', 'POST'])
+@hero_required
+def excluir_heroi(id_heroi):
+    conn = get_connection()
+    cursor = conn.cursor(dictionary=True)
+
+    cursor.execute("""
+        SELECT h.*, t.nome_time
+        FROM herois h
+        JOIN times t ON t.id_time = h.id_time
+        WHERE h.id_heroi = %s
+    """, (id_heroi,))
+    heroi = cursor.fetchone()
+
+    if not heroi:
+        cursor.close()
+        conn.close()
+        flash("Herói não encontrado.", "erro")
+        return redirect(url_for('index'))
+    
+    if request.method == 'POST':
+        cursor.execute('DELETE FROM herois WHERE id_heroi = %s', (id_heroi,))
+        conn.commit()
+        cursor.close()
+        conn.close()
+        flash("Herói excluído com sucesso!", "sucesso")
+        return redirect(url_for('ver_time', id_time=heroi['id_time']))
+    
+    cursor.close()
+    conn.close()
+    return render_template('excluir_heroi', id_heroi=id_heroi)
+
+# endregion
+
+# region TIME
+
+@app.route('/time/<int:id_time>/editar', methods=['GET', 'POST'])
+@team_required
+def editar_time(id_time):
+    conn = get_connection()
+    cursor = conn.cursor(dictionary=True)
+
+    cursor.execute("SELECT * FROM times WHERE id_time = %s", (id_time,))
+    time_original = cursor.fetchone()
+
+    if not time_original:
+        cursor.close()
+        conn.close()
+        flash("Time não encontrado.", "erro")
+        return redirect(url_for('index'))
+
+    tipo_usuario = session.get('tipo_usuario')
+
+    form = dict(time_original)
+
+    if request.method == 'POST':
+        form['nome_time'] = request.form.get('nome_time', '').strip()
+        form['descricao'] = request.form.get('descricao', '').strip()
+
+        cursor.execute("""
+            SELECT id_time FROM times WHERE nome_time = %s AND id_time <> %s""",
+            (form['nome_heroi'], id_time)
+        )
+        if cursor.fetchone():
+            flash("Já existe um time com esse nome!", "warning")
+        else:
+            cursor.execute("""
+                UPDATE times
+                SET nome_time = %s, descricao = %s
+                WHERE id_time = %s
+            """, (form['nome_time'], form['descricao'], id_time))
+
+            conn.commit()
+            cursor.close()
+            conn.close()
+            flash("Time com sucesso!", "sucesso")
+            return redirect(url_for('ver_time', id_time=id_time))
+
+    cursor.close()
+    conn.close()
+    return render_template('editar_heroi.html', form=form)
+
+@app.route('/time/<int:id_time>/excluir', methods=['POST'])
+@team_required
+def excluir_time(id_time):
+    conn = get_connection()
+    cursor = conn.cursor(dictionary=True)
+
+    cursor.execute("SELECT * FROM times WHERE id_time = %s", (id_time,))
+    time = cursor.fetchone()
+
+    if not time:
+        flash("Time não encontrado.", "erro")
+        cursor.close()
+        conn.close()
+        return redirect(url_for('index'))
+
+    if request.method == 'POST':
+        cursor.execute("DELETE FROM times WHERE id_time = %s", (id_time,))
+        conn.commit()
+        cursor.close()
+        conn.close()
+        flash("Time excluído com sucesso!", "sucesso")
+        return redirect(url_for('index'))
+
+    cursor.close()
+    conn.close()
+
+# endregion
+
+# region USUÁRIO
+
+@app.route('/usuario/editar', methods=['GET', 'POST'])
+@login_required
+def editar_usuario():
+    conn = get_connection()
+    cursor = conn.cursor(dictionary=True)
+
+    id_usuario = session.get('id_usuario')
+
+    cursor.execute("""
+        SELECT *
+        FROM usuarios
+        WHERE id_usuario = %s
+    """, (id_usuario))
+    usuario_original = cursor.fetchone()
+
+    if not usuario_original:
+        cursor.close()
+        conn.close()
+        flash("Usuário não encotrado.", "erro")
+        return redirect(url_for('index'))
+    
+    form = dict(usuario_original)
+
+    if request.method == 'POST':
+        form['nome_usuario'] = request.form.get('nome_usuario').strip()
+        form['email'] = request.form.get('email').strip()
+
+        cursor.execute("SELECT id_usuario FROM usuarios WHERE email = %s", (form['email'],))       
+        if cursor.fetchone():
+            flash("Já existe um usuário com este e-mail.", "erro")
+        else:
+            cursor.execute("SELECT id_usuario FROM usuarios WHERE nome_usuario = %s", (form['nome_usuario'],))
+            if cursor.fetchone():
+               flash("Já existe um usuário com este nome.", "erro")
+            else:
+                cursor.execute("""
+                    UPDATE usuarios
+                    SET nome_usuario = %s, email = %s
+                    WHERE id_usuario = %s
+                """, (form['nome_usuario'], form['email'], id_usuario))
+
+                conn.commit()
+                cursor.close()
+                conn.close()
+                return redirect(url_for('index'))
+                    
+    cursor.close()
+    conn.close()
+    return render_template('editar_usuario.html', form=form)
+
+@app.route('/usuario/alterar_senha', methods=['GET', 'POST'])
+@login_required
+def alterar_senha():
+    conn = get_connection()
+    cursor = conn.cursor(dictionary=True)
+
+    id_usuario = session.get('id_usuario')
+
+    cursor.execute("""
+        SELECT senha_hash
+        FROM usuarios
+        WHERE id_usuario = %s
+    """, (id_usuario,))
+    usuario = cursor.fetchone()
+
+    if not usuario:
+        cursor.close()
+        conn.close()
+        flash("Usuário não encotrado.", "erro")
+        return redirect(url_for('index'))
+    
+    form = dict(usuario)
+
+    if request.method == 'POST':
+        form['senha'] = request.form.get('senha').strip()
+        form['confirmar'] = request.form.get('confirmar').strip()
+
+        if form['senha'] != form['confirmar']:
+            flash("Senha e confirmação são diferentes", "erro")
+        elif check_password_hash(usuario['senha_hash'], form['senha']):
+            flash("Senha igual a anterior!", "erro")
+        else:
+            cursor.execute("""
+                UPDATE usuarios
+                SET senha_hash = %s
+                WHERE id_usuario = %s
+            """, (generate_password_hash(form['senha']), id_usuario))
+
+            conn.commit()
+            cursor.close()
+            conn.close()
+            flash("Senha alterada com sucesso!", "sucesso")
+            return redirect(url_for('index'))
+    
+    cursor.close()
+    conn.close()
+    return render_template('editar_usuario.html', form=form)
+
+@app.route('/usuario/excluir', methods=['POST'])
+@login_required
+def excluir_usuario():
+    conn = get_connection()
+    cursor = conn.cursor(dictionary=True)
+
+    id_usuario = session.get('id_usuario')
+
+    cursor.execute('DELETE FROM usuarios WHERE id_usuario = %s', (id_usuario,))
+    conn.commit()
+
+    cursor.close()
+    conn.close()
+
+    session.clear()
+    flash("Usuário excluído com sucesso!", "sucesso")
+    return redirect(url_for('index'))
+
+# endregion
+
+# region CLASSE
+
+@app.route('/classe/novo', methods=['GET', 'POST'])
+@admin_required
+def adicionar_heroi():
+    conn = get_connection()
+    cursor = conn.cursor(dictionary=True)
+    
+    form = {}
+    
+    if request.method == "POST":
+        form['nome_classe'] = request.form['nome_classe'].strip()
+        form['descricao'] = request.form['descricao'].strip()
+        
+        cursor.execute("SELECT id_classe FROM classes WHERE nome_classe = %s", (form['nome_classe'],))
+        if cursor.fetchone():
+            flash("Já existe uma classe com esse nome!", "warning")
+        else:
+            cursor.execute("""
+                INSERT INTO classes
+                (nome_classe, descricao)
+                VALUES
+                (%s, %s)""",
+                (form['nome_classe'], form['descricao'])
+            )
+            conn.commit()
+            
+            novo_id = cursor.lastrowid
+            
+            cursor.close()
+            conn.close()
+            flash("Classe adicionada com sucesso!", "sucesso")
+            return redirect(url_for('listar_classes'))
+        
+    cursor.close()
+    conn.close()
+    return render_template('adicionar_classe',  form=form)
+
+@app.route('/classe/<int:id_classe>/editar', methods=['GET', 'POST'])
+@admin_required
+def editar_classe(id_classe):
+    conn = get_connection()
+    cursor = conn.cursor(dictionary=True)
+    
+    cursor.execute("SELECT * FROM classes WHERE id_classe = %s", (id_classe,))
+    classe_original = cursor.fetchall()
+    
+    if not classe_original:
+        cursor.close()
+        conn.close()
+        flash("Classe não encontrada.", "erro")
+        return redirect(url_for('index'))
+    
+    form = dict(classe_original)
+    
+    if request.method == "POST":
+        form['nome_classe'] = request.form.get('nome_classe', '').strip()
+        form['descricao'] = request.form.get('descricao', '').strip()
+        
+        cursor.execute("""
+            SELECT id_time FROM classes WHERE nome_classe = %s AND id_time <> %s""",
+            (form['nome_class'], id_classe)
+        )
+        if cursor.fetchone():
+            flash("Já existe uma classe com esse nome!", "warning")
+        else:
+            cursor.execute("""
+                UPDATE classes
+                SET nome_classe = %s, descricao = %s
+                WHERE id_classe = %s
+            """, (form['nome_class'], form['descricao'], id_classe))
+            
+            conn.commit()
+            cursor.close()
+            conn.close()
+            flash("Time com sucesso!", "sucesso")
+            return redirect(url_for('listar_classes'))
+    
+    cursor.close()
+    conn.close()
+    return render_template('editar_heroi.html', form=form)
+
+# endregion
+
+# endregion
+# ._____ ____._______
+#(  .       (
+# '-'        '
 
 
 
-# .-.  .
-# @  )  )
-#.>.= .'\
-#:/  -}=--=<{%@%}>====-------
-# region Comentado
+# \.
+# .'¨¨¨'.
+#/  __   \    `;
+# .' .'  /,   ,¨'-
+#/'.___.'__'__'._____('________ ____
+#
+# region COMENTADO
 # # ==============================================================
 # # LOGIN / CADASTRO / LOGOUT
 # # ==============================================================
@@ -726,21 +1094,25 @@ def editar_heroi(id_heroi):
 #     conn.close()
 
 #     return render_template('dashboard_time.html', time=time, herois=herois)
-#endregion
-#:\  -}====-------
-# /'
+# endregion
+# ._____ ____._______
+#(  .       (
+# '-'        '
 
 
 
-# .-.  .
-# @  )  )
-#.>.= .'\
-#:/  -}=--=<{%@%}>====-------
+# \.
+# .'¨¨¨'.
+#/  __   \    `;
+# .' .'  /,   ,¨'-
+#/'.___.'__'__'._____('________ ____
+#
 # region EXECUÇÃO
 
 if __name__ == '__main__':
     app.run(debug=True)
 
 # endregion
-#:\  -}====-------
-# /'
+# ._____ ____._______
+#(  .       (
+# '-'        '
