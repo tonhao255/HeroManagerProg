@@ -1,0 +1,56 @@
+{% extends "base.html" %}
+{% block title %}Registrar{% endblock %}
+{% block content %}
+
+<h2 class="mb-3">Criar Conta & Time</h2>
+
+<form method="POST" class="mb-4">
+
+    <h4 class="mb-3">Informações do Usuário</h4>
+
+    <div class="mb-3">
+        <label class="form-label">Nome de Usuário</label>
+        <input name="nome_usuario"
+               value="{{ nome_usuario if nome_usuario is defined }}"
+               class="form-control"
+               required>
+    </div>
+
+    <div class="mb-3">
+        <label class="form-label">Email</label>
+        <input name="email"
+               type="email"
+               value="{{ email if email is defined }}"
+               class="form-control"
+               required>
+    </div>
+
+    <div class="mb-3">
+        <label class="form-label">Senha</label>
+        <input name="senha" type="password" class="form-control" required>
+    </div>
+
+    <hr class="my-4">
+
+    <h4 class="mb-3">Informações do Time</h4>
+
+    <div class="mb-3">
+        <label class="form-label">Nome do Time</label>
+        <input name="nome_time"
+               value="{{ nome_time if nome_time is defined }}"
+               class="form-control"
+               required>
+    </div>
+
+    <div class="mb-3">
+        <label class="form-label">Descrição do Time</label>
+        <textarea name="descricao_time"
+                  class="form-control"
+                  rows="3"
+                  required>{{ descricao_time if descricao_time is defined }}</textarea>
+    </div>
+
+    <button class="btn btn-success mt-3">Registrar</button>
+</form>
+
+{% endblock %}

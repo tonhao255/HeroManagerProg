@@ -1,0 +1,31 @@
+{% extends 'base.html' %}
+{% block content %}
+<h2>Time: {{ time.nome_time }}</h2>
+
+<p><strong>Descrição:</strong> {{ time.descricao }}</p>
+<p><strong>Criado por:</strong> {{ time.nome_usuario }}</p>
+
+<h4 class="mt-4">Heróis do Time</h4>
+<ul class="list-group mb-3">
+    {% for heroi in herois %}
+    <li class="list-group-item">
+        <a href="{{ url_for('ver_heroi', id_heroi=heroi.id_heroi) }}">
+            {{ heroi.nome_heroi }}
+        </a>
+    </li>
+    {% else %}
+    <li class="list-group-item text-muted">Nenhum herói neste time.</li>
+    {% endfor %}
+</ul>
+
+<a href="{{ url_for('editar_time', id_time=time.id_time) }}" class="btn btn-warning">Editar</a>
+
+<form action="{{ url_for('excluir_time', id_time=time.id_time) }}"
+      method="post" class="d-inline"
+      onsubmit="return confirm('Excluir este time permanentemente?');">
+    <button class="btn btn-danger">Excluir</button>
+</form>
+
+<a href="{{ url_for('listar_times') }}" class="btn btn-secondary">Voltar</a>
+
+{% endblock %}

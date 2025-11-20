@@ -26,6 +26,7 @@ from functools import wraps
 from werkzeug.security import generate_password_hash, check_password_hash
 import mysql.connector
 from mysql.connector import Error
+from datetime import datetime
 
 # endregion
 # ._____ ____._______
@@ -59,6 +60,10 @@ def get_connection():
     except Error as e:
         print(f"Erro ao conectar ao banco: {e}")
         return None
+
+@app.context_processor
+def inject_now():
+    return {'now': datetime.now}
 
 # endregion
 # ._____ ____._______
@@ -180,6 +185,7 @@ def listar_herois():
             h.forca,
             h.defesa,
             h.velocidade,
+            h.imagem_url,
             h.rank,
             h.posicao,
             c.nome_classe AS classe,
@@ -191,23 +197,30 @@ def listar_herois():
     herois = cursor.fetchall()
     cursor.close()
     conn.close()
-    return render_template('herois.html', herois)
+    return render_template('herois.html', herois=herois)
 
 @app.route('/heroi/<int:id_heroi>', methods=['GET'])
 def ver_heroi(id_heroi):
     conn = get_connection()
     cursor = conn.cursor(dictionary=True)
+
     cursor.execute("""
-        SELECT h.*, t.nome_time
+        SELECT h.*, 
+               t.nome_time,
+               c.nome_classe
         FROM herois h
         JOIN times t ON t.id_time = h.id_time
+        JOIN classes c ON c.id_classe = h.id_classe
         WHERE h.id_heroi = %s
     """, (id_heroi,))
+
     heroi = cursor.fetchone()
+
     cursor.close()
     conn.close()
 
     return render_template('ver_heroi.html', heroi=heroi)
+
 
 # endregion
 
@@ -234,7 +247,7 @@ def listar_times():
     cursor.close()
     conn.close()
 
-    return render_template('times.html', times)
+    return render_template('times.html', times=times)
 
 @app.route('/time/<int:id_time>', methods=['GET'])
 def ver_time(id_time):
@@ -253,7 +266,6 @@ def ver_time(id_time):
 # region CLASSE
 
 @app.route('/classes', methods=['GET'])
-@admin_required
 def listar_classes():
     conn = get_connection()
     cursor = conn.cursor(dictionary=True)
@@ -261,10 +273,10 @@ def listar_classes():
         SELECT * FROM classes
     """)
     classes = cursor.fetchall()
-    cursor.close
+    cursor.close()
     conn.close()
     
-    return render_template('classes.html', classes=classes)
+    return render_template('classes.html', classes=classes, tipo=session["tipo_usuario"])
 
 # endregion
 
@@ -462,7 +474,7 @@ def adicionar_heroi():
         if cursor.fetchone():
             flash("Já existe um herói com esse nome!", "warning")
         else:
-            cursor.execute("""SELECT MAX(posicao_ranking) AS ultima_pos
+            cursor.execute("""SELECT MAX(posicao) AS ultima_pos
                 FROM herois
                 WHERE rank = 'D'""")
             ultima_pos = cursor.fetchone()['ultima_pos'] or 0
@@ -518,6 +530,7 @@ def editar_heroi(id_heroi):
         cursor.execute("SELECT id_time, nome_time FROM times ORDER BY nome_time")
         times = cursor.fetchall()
 
+    # form começa com os valores originais
     form = dict(heroi_original)
 
     if request.method == 'POST':
@@ -534,20 +547,27 @@ def editar_heroi(id_heroi):
             form['rank'] = request.form.get('rank', 'D')
         else:
             form['id_time'] = session.get('id_time')
+            form['rank'] = heroi_original['rank']
 
         cursor.execute("""
-            SELECT id_heroi FROM herois WHERE nome_heroi = %s AND id_heroi <> %s""",
-            (form['nome_heroi'], id_heroi)
-        )
+            SELECT id_heroi FROM herois 
+            WHERE nome_heroi = %s AND id_heroi <> %s
+        """, (form['nome_heroi'], id_heroi))
+
         if cursor.fetchone():
             flash("Já existe um herói com esse nome!", "warning")
         else:
             cursor.execute("""
                 UPDATE herois
-                SET nome_heroi=%s, id_classe=%s, imagem_url=%s, habilidades=%s, forca=%s, defesa=%s, velocidade=%s, id_time=%s, rank=%s
-                WHERE id_heroi = %s""", 
-                (form['nome_heroi'], form['id_classe'], form['imagem_url'], form['habilidades'], form['forca'], form['defesa'], form['velocidade'], form['id_time'], form['classe_ranking'], id_heroi)
+                SET nome_heroi=%s, id_classe=%s, imagem_url=%s, habilidades=%s,
+                    forca=%s, defesa=%s, velocidade=%s, id_time=%s, rank=%s
+                WHERE id_heroi = %s
+            """, 
+                (form['nome_heroi'], form['id_classe'], form['imagem_url'],
+                 form['habilidades'], form['forca'], form['defesa'],
+                 form['velocidade'], form['id_time'], form['rank'], id_heroi)
             )
+
             conn.commit()
             cursor.close()
             conn.close()
@@ -682,7 +702,7 @@ def editar_usuario():
         SELECT *
         FROM usuarios
         WHERE id_usuario = %s
-    """, (id_usuario))
+    """, (id_usuario,))
     usuario_original = cursor.fetchone()
 
     if not usuario_original:
@@ -697,11 +717,11 @@ def editar_usuario():
         form['nome_usuario'] = request.form.get('nome_usuario').strip()
         form['email'] = request.form.get('email').strip()
 
-        cursor.execute("SELECT id_usuario FROM usuarios WHERE email = %s", (form['email'],))       
+        cursor.execute("""SELECT id_usuario FROM usuarios WHERE email = %s AND id_usuario != %s""", (form['email'], id_usuario))      
         if cursor.fetchone():
             flash("Já existe um usuário com este e-mail.", "erro")
         else:
-            cursor.execute("SELECT id_usuario FROM usuarios WHERE nome_usuario = %s", (form['nome_usuario'],))
+            cursor.execute("""SELECT id_usuario FROM usuarios WHERE nome_usuario = %s AND id_usuario != %s""", (form['nome_usuario'], id_usuario))
             if cursor.fetchone():
                flash("Já existe um usuário com este nome.", "erro")
             else:
@@ -792,65 +812,62 @@ def excluir_usuario():
 
 @app.route('/classe/novo', methods=['GET', 'POST'])
 @admin_required
-def adicionar_heroi():
+def adicionar_classe():
     conn = get_connection()
     cursor = conn.cursor(dictionary=True)
-    
-    form = {}
-    
+
+    form = {'nome_classe': '', 'descricao': ''}
+
     if request.method == "POST":
         form['nome_classe'] = request.form['nome_classe'].strip()
         form['descricao'] = request.form['descricao'].strip()
-        
+
         cursor.execute("SELECT id_classe FROM classes WHERE nome_classe = %s", (form['nome_classe'],))
         if cursor.fetchone():
             flash("Já existe uma classe com esse nome!", "warning")
         else:
             cursor.execute("""
-                INSERT INTO classes
-                (nome_classe, descricao)
-                VALUES
-                (%s, %s)""",
-                (form['nome_classe'], form['descricao'])
-            )
+                INSERT INTO classes (nome_classe, descricao)
+                VALUES (%s, %s)
+            """, (form['nome_classe'], form['descricao']))
             conn.commit()
-            
-            novo_id = cursor.lastrowid
-            
+
             cursor.close()
             conn.close()
             flash("Classe adicionada com sucesso!", "sucesso")
             return redirect(url_for('listar_classes'))
-        
+
     cursor.close()
     conn.close()
-    return render_template('adicionar_classe',  form=form)
+    return render_template('adicionar_classe.html', form=form)
 
 @app.route('/classe/<int:id_classe>/editar', methods=['GET', 'POST'])
 @admin_required
 def editar_classe(id_classe):
     conn = get_connection()
     cursor = conn.cursor(dictionary=True)
-    
+
     cursor.execute("SELECT * FROM classes WHERE id_classe = %s", (id_classe,))
-    classe_original = cursor.fetchall()
-    
+    classe_original = cursor.fetchone()
+
     if not classe_original:
         cursor.close()
         conn.close()
         flash("Classe não encontrada.", "erro")
-        return redirect(url_for('index'))
-    
+        return redirect(url_for('listar_classes'))
+
     form = dict(classe_original)
-    
+
     if request.method == "POST":
         form['nome_classe'] = request.form.get('nome_classe', '').strip()
         form['descricao'] = request.form.get('descricao', '').strip()
-        
+
+        # Validar duplicado
         cursor.execute("""
-            SELECT id_time FROM classes WHERE nome_classe = %s AND id_time <> %s""",
-            (form['nome_class'], id_classe)
-        )
+            SELECT id_classe FROM classes
+            WHERE nome_classe = %s AND id_classe <> %s
+        """, (form['nome_classe'], id_classe))
+        
         if cursor.fetchone():
             flash("Já existe uma classe com esse nome!", "warning")
         else:
@@ -858,17 +875,52 @@ def editar_classe(id_classe):
                 UPDATE classes
                 SET nome_classe = %s, descricao = %s
                 WHERE id_classe = %s
-            """, (form['nome_class'], form['descricao'], id_classe))
+            """, (form['nome_classe'], form['descricao'], id_classe))
             
             conn.commit()
             cursor.close()
             conn.close()
-            flash("Time com sucesso!", "sucesso")
+            flash("Classe atualizada com sucesso!", "sucesso")
             return redirect(url_for('listar_classes'))
-    
+
     cursor.close()
     conn.close()
-    return render_template('editar_heroi.html', form=form)
+    return render_template('editar_classe.html', form=form)
+
+@app.route('/classe/<int:id_classe>/excluir', methods=['POST'])
+@admin_required
+def excluir_classe(id_classe):
+    conn = get_connection()
+    cursor = conn.cursor(dictionary=True)
+
+    try:
+        # Verificar se a classe existe
+        cursor.execute("SELECT * FROM classes WHERE id_classe = %s", (id_classe,))
+        classe = cursor.fetchone()
+
+        if not classe:
+            flash("Classe não encontrada.", "erro")
+            cursor.close()
+            conn.close()
+            return redirect(url_for('listar_classes'))
+
+        # Excluir classe
+        cursor.execute("DELETE FROM classes WHERE id_classe = %s", (id_classe,))
+        conn.commit()
+
+        flash("Classe excluída com sucesso!", "sucesso")
+
+    except mysql.connector.Error as err:
+        print("Erro ao excluir classe:", err)
+        flash("Erro inesperado ao excluir a classe.", "erro")
+        conn.rollback()
+
+    finally:
+        cursor.close()
+        conn.close()
+
+    return redirect(url_for('listar_classes'))
+
 
 # endregion
 
@@ -876,230 +928,6 @@ def editar_classe(id_classe):
 # ._____ ____._______
 #(  .       (
 # '-'        '
-
-
-
-# \.
-# .'¨¨¨'.
-#/  __   \    `;
-# .' .'  /,   ,¨'-
-#/'.___.'__'__'._____('________ ____
-#
-# region COMENTADO
-# # ==============================================================
-# # LOGIN / CADASTRO / LOGOUT
-# # ==============================================================
-
-# @app.route('/login', methods=['GET', 'POST'])
-# def login():
-#     if request.method == 'POST':
-#         email = request.form['email']
-#         senha = request.form['senha']
-
-#         conn = get_db_connection()
-#         cursor = conn.cursor(dictionary=True)
-#         cursor.execute("SELECT * FROM usuarios WHERE email = %s", (email,))
-#         user = cursor.fetchone()
-#         cursor.close()
-#         conn.close()
-
-#         if user and check_password_hash(user['senha_hash'], senha):
-#             session['id_usuario'] = user['id_usuario']
-#             session['tipo_usuario'] = user['tipo']
-#             session['nome_usuario'] = user['nome_usuario']
-#             return redirect(url_for('dashboard'))
-#         else:
-#             flash('Email ou senha incorretos.', 'erro')
-
-#     return render_template('login.html')
-
-# @app.route('/cadastro', methods=['GET', 'POST'])
-# def cadastro():
-#     if request.method == 'POST':
-#         nome = request.form['nome']
-#         email = request.form['email']
-#         senha = generate_password_hash(request.form['senha'])
-#         tipo = request.form.get('tipo', 'TIME')
-
-#         conn = get_db_connection()
-#         cursor = conn.cursor()
-#         cursor.execute("INSERT INTO usuarios (nome_usuario, email, senha_hash, tipo) VALUES (%s, %s, %s, %s)",
-#                        (nome, email, senha, tipo))
-#         conn.commit()
-
-#         if tipo == 'TIME':
-#             cursor.execute("SELECT LAST_INSERT_ID()")
-#             user_id = cursor.fetchone()[0]
-#             cursor.execute("INSERT INTO times (nome_time, id_usuario) VALUES (%s, %s)", (f"Time de {nome}", user_id))
-#             conn.commit()
-
-#         cursor.close()
-#         conn.close()
-#         flash('Conta criada com sucesso!', 'sucesso')
-#         return redirect(url_for('login'))
-
-#     return render_template('cadastro.html')
-
-# @app.route('/logout')
-# def logout():
-#     session.clear()
-#     flash('Sessão encerrada.', 'info')
-#     return redirect(url_for('index'))
-
-# # ==============================================================
-# # ROTAS PÚBLICAS
-# # ==============================================================
-
-# @app.route('/')
-# def index():
-#     return render_template('index.html')
-
-# @app.route('/ranking/herois')
-# def ranking_herois():
-#     conn = get_db_connection()
-#     cursor = conn.cursor(dictionary=True)
-#     cursor.execute("""
-#         SELECT h.*, t.nome_time 
-#         FROM herois h
-#         JOIN times t ON t.id_time = h.id_time
-#         ORDER BY h.rank_geral ASC
-#     """)
-#     herois = cursor.fetchall()
-#     cursor.close()
-#     conn.close()
-#     return render_template('ranking_herois.html', herois=herois)
-
-# @app.route('/ranking/times')
-# def ranking_times():
-#     conn = get_db_connection()
-#     cursor = conn.cursor(dictionary=True)
-#     cursor.execute("""
-#         SELECT t.*, COUNT(h.id_heroi) AS qtd_herois
-#         FROM times t
-#         LEFT JOIN herois h ON h.id_time = t.id_time
-#         GROUP BY t.id_time
-#         ORDER BY t.rank_geral ASC
-#     """)
-#     times = cursor.fetchall()
-#     cursor.close()
-#     conn.close()
-#     return render_template('ranking_times.html', times=times)
-
-# @app.route('/time/<int:id_time>')
-# def ver_time(id_time):
-#     conn = get_db_connection()
-#     cursor = conn.cursor(dictionary=True)
-#     cursor.execute("SELECT * FROM times WHERE id_time = %s", (id_time,))
-#     time = cursor.fetchone()
-#     cursor.execute("SELECT * FROM herois WHERE id_time = %s ORDER BY id_heroi", (id_time,))
-#     herois = cursor.fetchall()
-#     cursor.close()
-#     conn.close()
-#     return render_template('ver_time.html', time=time, herois=herois)
-
-# @app.route('/heroi/<int:id_heroi>')
-# def ver_heroi(id_heroi):
-#     conn = get_db_connection()
-#     cursor = conn.cursor(dictionary=True)
-#     cursor.execute("""
-#         SELECT h.*, t.nome_time
-#         FROM herois h
-#         JOIN times t ON t.id_time = h.id_time
-#         WHERE h.id_heroi = %s
-#     """, (id_heroi,))
-#     heroi = cursor.fetchone()
-#     cursor.close()
-#     conn.close()
-#     return render_template('ver_heroi.html', heroi=heroi)
-
-# # ==============================================================
-# # ROTAS TIME
-# # ==============================================================
-
-
-
-# # ==============================================================
-# # ROTAS ADMIN
-# # ==============================================================
-
-# @admin_bp.route('/')
-# @admin_required
-# def painel_admin():
-#     conn = get_db_connection()
-#     cursor = conn.cursor(dictionary=True)
-#     cursor.execute("""
-#         SELECT t.id_time, t.nome_time, u.nome_usuario
-#         FROM times t
-#         JOIN usuarios u ON t.id_usuario = u.id_usuario
-#         ORDER BY t.nome_time
-#     """)
-#     times = cursor.fetchall()
-#     cursor.close()
-#     conn.close()
-#     return render_template('dashboard_admin.html', times=times)
-
-# @admin_bp.route('/time/<int:id_time>')
-# @admin_required
-# def admin_ver_time(id_time):
-#     conn = get_db_connection()
-#     cursor = conn.cursor(dictionary=True)
-#     cursor.execute("SELECT * FROM times WHERE id_time = %s", (id_time,))
-#     time = cursor.fetchone()
-#     cursor.execute("SELECT * FROM herois WHERE id_time = %s ORDER BY id_heroi", (id_time,))
-#     herois = cursor.fetchall()
-#     cursor.close()
-#     conn.close()
-#     return render_template('ver_time.html', time=time, herois=herois, modo_admin=True)
-
-# @admin_bp.route('/dashboard')
-# @admin_required
-# def dashboard_admin():
-#     conn = get_db_connection()
-#     cursor = conn.cursor(dictionary=True)
-#     cursor.execute("""
-#         SELECT t.id_time, t.nome_time, u.nome_usuario, COUNT(h.id_heroi) AS qtd_herois
-#         FROM times t
-#         JOIN usuarios u ON t.id_usuario = u.id_usuario
-#         LEFT JOIN herois h ON h.id_time = t.id_time
-#         GROUP BY t.id_time
-#         ORDER BY t.nome_time
-#     """)
-#     times = cursor.fetchall()
-#     cursor.close()
-#     conn.close()
-#     return render_template('dashboard_admin.html', times=times)
-
-# # ==============================================================
-# # DASHBOARD (time)
-# # ==============================================================
-
-# @app.route('/dashboard')
-# @login_required
-# def dashboard_time():
-#     id_usuario = session.get('id_usuario')
-#     tipo = session.get('tipo_usuario')
-
-#     # Evita que o admin acesse esta rota
-#     if tipo == 'ADMIN':
-#         flash("Acesse o painel administrativo.", "info")
-#         return redirect(url_for('admin.dashboard_admin'))
-
-#     conn = get_db_connection()
-#     cursor = conn.cursor(dictionary=True)
-#     cursor.execute("SELECT * FROM times WHERE id_usuario = %s", (id_usuario,))
-#     time = cursor.fetchone()
-#     cursor.execute("SELECT * FROM herois WHERE id_time = %s ORDER BY id_heroi", (time['id_time'],))
-#     herois = cursor.fetchall()
-#     cursor.close()
-#     conn.close()
-
-#     return render_template('dashboard_time.html', time=time, herois=herois)
-# endregion
-# ._____ ____._______
-#(  .       (
-# '-'        '
-
-
 
 # \.
 # .'¨¨¨'.

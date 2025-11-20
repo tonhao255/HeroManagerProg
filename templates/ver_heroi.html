@@ -1,0 +1,178 @@
+{% extends 'base.html' %}
+{% block content %}
+
+<style>
+    /* ---- Rank S (Arco-íris com animação e glow) ---- */
+    .rank-s {
+        font-weight: bold;
+        background: linear-gradient(
+            90deg,
+            #ff0000,
+            #ff7f00,
+            #ffff00,
+            #00ff00,
+            #0000ff,
+            #8b00ff,
+            #ff1493
+        );
+        background-size: 400%;
+        -webkit-background-clip: text;
+        -webkit-text-fill-color: transparent;
+        animation: rainbowFlow 6s linear infinite;
+        text-shadow: 0 0 10px rgba(255,255,255,0.6), 0 0 20px rgba(255,255,255,0.4);
+    }
+
+    @keyframes rainbowFlow {
+        0% { background-position: 0%; }
+        100% { background-position: 400%; }
+    }
+
+    /* ---- Rank A (Ouro) ---- */
+    .rank-a {
+        background: linear-gradient(135deg, #b1f3ff, #7cfbff, #00b5bb);
+        -webkit-background-clip: text;
+        -webkit-text-fill-color: transparent;
+        text-shadow: 0 0 6px rgba(0, 217, 255, 0.4);
+    }
+
+    /* ---- Rank B (Prata) ---- */
+    .rank-b {
+        background: linear-gradient(135deg, #e29587, hsl(0, 100%, 63%), #a80000);
+        -webkit-background-clip: text;
+        -webkit-text-fill-color: transparent;
+        text-shadow: 0 0 6px rgba(212, 81, 98, 0.4);
+    }
+
+    /* ---- Rank C (Bronze) ---- */
+    .rank-c {
+        background: linear-gradient(135deg, #f2c197, #cd7f32, #8b4513);
+        -webkit-background-clip: text;
+        -webkit-text-fill-color: transparent;
+        text-shadow: 0 0 6px rgba(205,127,50,0.4);
+    }
+
+    /* ---- Rank D (Ferro) ---- */
+    .rank-d {
+        background: linear-gradient(135deg, #b0b0b0, #696969, #3a3a3a);
+        -webkit-background-clip: text;
+        -webkit-text-fill-color: transparent;
+        text-shadow: 0 0 6px rgba(105,105,105,0.4);
+    }
+    .rank-wrapper {
+        position: relative; /* necessário para posicionar o ícone atrás */
+        width: 180px;
+        height: 180px;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+    }
+    .rank-letter {
+        font-size: 120px;
+        font-weight: bold;
+        line-height: 1;
+        z-index: 2;
+    }
+    .rank-icon {
+        position: absolute;
+        top: 50%;
+        left: 50%;
+        transform: translate(-50%, -50%);
+        font-size: 110px;
+        z-index: 1;
+        width: 300px;
+        height: 300px;
+    }
+</style>
+
+
+{% set rank_class = {
+    'S': 'rank-s',
+    'A': 'rank-a',
+    'B': 'rank-b',
+    'C': 'rank-c',
+    'D': 'rank-d'
+}[heroi.rank] %}
+
+<h2 class="mb-4">Ficha do Herói: {{ heroi.nome_heroi }}</h2>
+
+<div class="row">
+    <!-- Imagem -->
+    <div class="col-md-4 text-center">
+        <img src="{{ heroi.imagem_url }}" class="img-fluid rounded shadow" alt="Imagem do herói">
+
+        <div class="mt-3">
+            <h5 class="text-muted">{{ heroi.nome_time }}</h5>
+            <p class="text-secondary">Classe: {{ heroi.nome_classe }}</p>
+        </div>
+    </div>
+
+    <!-- Rank e posição 
+    <div class="col-md-4 d-flex align-items-center justify-content-center">
+        <div class="rank-wrapper text-center">
+            
+            <div class="icon-{{ rank_class }} rank-icon"></div>
+
+            
+            <div class="{{ rank_class }} rank-letter">
+                {{ heroi.rank }}
+            </div>
+
+            
+            <div class="rank-posicao">
+                {{ heroi.posicao if heroi.posicao else '' }}
+            </div>
+            <div class="text-muted rank-posicao-label">
+                {{ 'Posição Global' if heroi.posicao else '' }}
+            </div>
+        </div>
+    </div>-->
+    <div class="col-md-4 d-flex align-items-center justify-content-center">
+        <div class="rank-wrapper text-center">
+            <!-- Ícone com imagem -->
+            {% if heroi.rank in ['B', 'A', 'S'] %}
+                <img class="rank-icon" src="{{ url_for('static', filename='icons/rank-' ~ heroi.rank|lower ~ '.png') }}" class="rank-icon">
+            {% endif %}
+
+            <!-- RANK com estilo aplicado -->
+            <div class="{{ rank_class }} rank-letter">
+                {{ heroi.rank }}
+            </div>
+
+            <div class="rank-posicao">
+                {{ heroi.posicao if heroi.posicao else '' }}
+            </div>
+            <div class="text-muted rank-posicao-label">
+                {{ 'Posição Global' if heroi.posicao else '' }}
+            </div>
+        </div>
+    </div>
+
+
+
+    <!-- Dados do herói -->
+    <div class="col-md-4">
+        <h4>Atributos</h4>
+        <ul class="list-group">
+            <li class="list-group-item">
+                Força: <strong>{{ heroi.forca }}</strong>
+            </li>
+            <li class="list-group-item">
+                Defesa: <strong>{{ heroi.defesa }}</strong>
+            </li>
+            <li class="list-group-item">
+                Velocidade: <strong>{{ heroi.velocidade }}</strong>
+            </li>
+        </ul>
+
+        <h4 class="mt-4">Habilidades</h4>
+        <p>{{ heroi.habilidades }}</p>
+    </div>
+</div>
+
+<div class="mt-4">
+    <a href="{{ url_for('editar_heroi', id_heroi=heroi.id_heroi) }}" class="btn btn-warning">Editar</a>
+    <a href="{{ url_for('listar_herois') }}" class="btn btn-secondary">Voltar</a>
+</div>
+
+{% endblock %}

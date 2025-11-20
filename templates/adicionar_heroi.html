@@ -1,0 +1,60 @@
+{% extends "base.html" %}
+{% block title %}Adicionar Herói{% endblock %}
+{% block content %}
+
+<h2 class="mb-3">Adicionar Herói</h2>
+
+<form method="POST">
+    <div class="mb-3">
+        <label class="form-label">Nome</label>
+        <input name="nome_heroi" class="form-control" required>
+    </div>
+
+    <div class="mb-3">
+        <label>Imagem (URL)</label>
+        <input name="imagem_url" class="form-control">
+    </div>
+
+    <div class="mb-3">
+        <label>Habilidades</label>
+        <textarea name="habilidades" class="form-control"></textarea>
+    </div>
+
+    <div class="row">
+        <div class="col">
+            <label>Força</label>
+            <input name="forca" class="form-control" type="number" value="0">
+        </div>
+        <div class="col">
+            <label>Defesa</label>
+            <input name="defesa" class="form-control" type="number" value="0">
+        </div>
+        <div class="col">
+            <label>Velocidade</label>
+            <input name="velocidade" class="form-control" type="number" value="0">
+        </div>
+    </div>
+
+    <div class="mb-3 mt-3">
+        <label>Classe</label>
+        <select class="form-select" name="id_classe">
+            {% for c in classes %}
+            <option value="{{ c.id_classe }}">{{ c.nome_classe }}</option>
+            {% endfor %}
+        </select>
+    </div>
+
+    <div class="mb-3">
+        <label>Time</label>
+        <select class="form-select" name="id_time">
+            <option value="">Nenhum</option>
+            {% for t in times %}
+            <option value="{{ t.id_time }}">{{ t.nome_time }}</option>
+            {% endfor %}
+        </select>
+    </div>
+
+    <button class="btn btn-success">Salvar</button>
+</form>
+
+{% endblock %}

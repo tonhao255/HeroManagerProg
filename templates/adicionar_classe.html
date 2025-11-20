@@ -1,0 +1,22 @@
+{% extends 'base.html' %}
+{% block content %}
+
+<h2 class="mb-3">Adicionar Classe</h2>
+
+<form method="POST">
+
+    <div class="mb-3">
+        <label class="form-label">Nome da Classe</label>
+        <input name="nome_classe" class="form-control" value="{{ form.nome_classe }}" required>
+    </div>
+
+    <div class="mb-3">
+        <label class="form-label">Descrição</label>
+        <textarea name="descricao" class="form-control">{{ form.descricao }}</textarea>
+    </div>
+
+    <button class="btn btn-success">Salvar</button>
+    <a href="{{ url_for('listar_classes') }}" class="btn btn-secondary">Cancelar</a>
+</form>
+
+{% endblock %}
