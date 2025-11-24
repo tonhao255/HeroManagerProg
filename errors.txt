@@ -1,0 +1,3 @@
+Sem login: link classes
+times > ver > criado por:???????
+Aparecer admin/time + nome.user
