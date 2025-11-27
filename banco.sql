@@ -1,12 +1,6 @@
---}>===-------===<:/%@@%/:>===-------===<{--
---|             CRIAÇÃO DO DB            |--
---}>===-------===<:/%@@%/:>===-------===<{--
 CREATE DATABASE sistema_herois;
 USE sistema_herois;
 
---}>===-------===<:/%@@%/:>===-------===<{--
---|       USUÁRIOS (ADMINS E TIMES)      |--
---}>===-------===<:/%@@%/:>===-------===<{--
 CREATE TABLE usuarios (
     id_usuario INT AUTO_INCREMENT PRIMARY KEY,
     nome_usuario VARCHAR(100) NOT NULL,
@@ -16,9 +10,6 @@ CREATE TABLE usuarios (
     data_criacao TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 );
 
---}>===-------===<:/%@@%/:>===-------===<{--
---|                 TIMES                |--
---}>===-------===<:/%@@%/:>===-------===<{--
 CREATE TABLE times (
     id_time INT AUTO_INCREMENT PRIMARY KEY,
     nome_time VARCHAR(100) NOT NULL UNIQUE,
@@ -29,18 +20,12 @@ CREATE TABLE times (
         ON DELETE CASCADE
 );
 
---}>===-------===<:/%@@%/:>===-------===<{--
---|           CLASSES DE HERÓIS          |--
---}>===-------===<:/%@@%/:>===-------===<{--
 CREATE TABLE classes (
     id_classe INT AUTO_INCREMENT PRIMARY KEY,
     nome_classe VARCHAR(100) NOT NULL UNIQUE,
     descricao TEXT
 );
 
---}>===-------===<:/%@@%/:>===-------===<{--
---|                HERÓIS                |--
---}>===-------===<:/%@@%/:>===-------===<{--
 CREATE TABLE herois (
     id_heroi INT AUTO_INCREMENT PRIMARY KEY,
     nome_heroi VARCHAR(100) NOT NULL,
@@ -61,45 +46,29 @@ CREATE TABLE herois (
         ON DELETE CASCADE
 );
 
-USE sistema_herois;
-
--- ============================================================
--- USUÁRIOS
--- ============================================================
 INSERT INTO usuarios (nome_usuario, email, senha_hash, tipo) VALUES
 ('Admin Master', 'admin@sistema.com', 'hash_admin_123', 'ADMIN'),
-('Time Alpha Líder', 'alpha@sistema.com', 'hash_alpha_123', 'TIME'),
+('Time Sigma Líder', 'alpha@sistema.com', 'hash_alpha_123', 'TIME'),
 ('Time Omega Líder', 'omega@sistema.com', 'hash_omega_123', 'TIME'),
 ('Time Phantom Líder', 'phantom@sistema.com', 'hash_phantom_123', 'TIME');
 
-
--- ============================================================
--- TIMES
--- ============================================================
 INSERT INTO times (nome_time, descricao, id_usuario) VALUES
-('Alpha Squad', 'Time focado em operações de elite', 2),
+('Sigma Squad', 'Time focado em operações de elite', 2),
 ('Omega Force', 'Especialistas em combate de larga escala', 3),
 ('Phantom Unit', 'Equipe furtiva voltada para infiltração', 4);
 
-
--- ============================================================
--- CLASSES DE HERÓIS
--- ============================================================
 INSERT INTO classes (nome_classe, descricao) VALUES
 ('Guerreiro', 'Especialista em combate corpo a corpo'),
 ('Arqueiro', 'Ataques à distância com alta precisão'),
 ('Mago', 'Usuário de magia arcana poderosa'),
 ('Tanque', 'Alta resistência e defesa'),
-('Assassino', 'Alta velocidade e dano crítico');
+('Assassino', 'Alta velocidade e dano crítico'),
+('Esotérico', 'Criatura mutante ou mista com humanos');
 
-
--- ============================================================
--- HERÓIS
--- ============================================================
 INSERT INTO herois 
 (nome_heroi, id_classe, imagem_url, habilidades, forca, defesa, velocidade, id_time, rank, posicao)
 VALUES
--- Alpha Squad
+-- Sigma Squad
 ('Valorian', 1, 'https://imagens-herois.com/valorian.png',
  'Golpe Flamejante, Lâmina Sagrada', 18, 14, 12, 1, 'A', 1),
 
@@ -128,3 +97,4 @@ VALUES
 
 ('Arcwyn', 3, 'https://imagens-herois.com/arcwyn.png',
  'Raios Arcanos, Barreira Mística', 14, 13, 14, 3, 'A', 3);
+
