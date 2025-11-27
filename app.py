@@ -77,6 +77,12 @@ def setup_database():
         )
         cursor = conn.cursor()
 
+        cursor.execute("SHOW DATABASES LIKE 'sistema_herois'")
+        if cursor.fetchone():
+            cursor.close()
+            conn.close()
+            return
+
         print("\n→ Criando banco de dados...")
         cursor.execute("DROP DATABASE IF EXISTS sistema_herois;")
         cursor.execute("CREATE DATABASE sistema_herois;")
@@ -1152,4 +1158,5 @@ if __name__ == '__main__':
 # ._____ ____._______
 #(  .       (
 # '-'        '
+
 
