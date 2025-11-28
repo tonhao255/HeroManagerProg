@@ -275,7 +275,7 @@ def setup_database():
         print("\n✔ Banco criado e populado com sucesso!")
 
     except Error as e:
-        print("❌ Erro:", e
+        print("❌ Erro:", e)
 
 setup_database()
 
@@ -1158,5 +1158,6 @@ if __name__ == '__main__':
 # ._____ ____._______
 #(  .       (
 # '-'        '
+
 
 
