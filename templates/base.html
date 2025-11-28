@@ -32,6 +32,11 @@
 
             <ul class="navbar-nav">
                 {% if session.get('id_usuario') %}
+                 <li class="nav-item d-flex align-items-center">
+                    <span class="nav-link text-white fs-6">{{ session.get('tipo_usuario') }}</span>
+                    <span class="nav-link me-2">{{ session.get('nome_usuario') }}</span>
+                </li>
+                <li class="nav-item">{{ session.get('nome_usuario') }}</li>
                 <li class="nav-item"><a href="{{ url_for('editar_usuario') }}" class="nav-link">Minha Conta</a></li>
                 <li class="nav-item"><a href="{{ url_for('logout') }}" class="nav-link text-danger">Sair</a></li>
                 {% else %}

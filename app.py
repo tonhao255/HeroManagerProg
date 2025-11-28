@@ -50,7 +50,8 @@ db_config = {
     'host': 'localhost',
     'user': 'root',
     'password': '',
-    'database': 'sistema_herois'
+    'database': 'sistema_herois',
+    'port': 3307
 }
 
 def get_connection():
@@ -70,11 +71,7 @@ def setup_database():
         # ===============================
         # 1. Conectar ao MySQL sem banco
         # ===============================
-        conn = mysql.connector.connect(
-            host="localhost",
-            user="root",
-            password=""     # senha padrão do XAMPP
-        )
+        conn = mysql.connector.connect(**db_config)
         cursor = conn.cursor()
 
         cursor.execute("SHOW DATABASES LIKE 'sistema_herois'")
@@ -228,33 +225,33 @@ def setup_database():
 
         herois = [
             # Sigma Squad
-            ('Valorian', classe_id("Guerreiro"), 'https://imagens-herois.com/valorian.png',
+            ('Valorian', classe_id("Guerreiro"), 'https://ik.imagekit.io/x2dirkim6/images/avatars/characters/character_avatar_L7L_3ytXr.webp?tr=w-3840',
              'Golpe Flamejante, Lâmina Sagrada', 18, 14, 12, sigma, 'A', 1),
 
-            ('Elyndra', classe_id("Mago"), 'https://imagens-herois.com/elyndra.png',
+            ('Elyndra', classe_id("Mago"), 'https://i.pinimg.com/originals/3d/64/88/3d6488707233cced488505a7304e5a20.jpg',
              'Explosão Arcana, Teleporte', 12, 10, 14, sigma, 'S', 2),
 
-            ('Ravenlock', classe_id("Assassino"), 'https://imagens-herois.com/ravenlock.png',
+            ('Ravenlock', classe_id("Assassino"), 'https://i0.wp.com/standsinthefire.com/wp-content/uploads/2015/06/rogue_by_sabin_boykinov-d486zda.jpg?resize=1400%2C1200&ssl=1',
              'Passo Sombrio, Golpe Crítico', 16, 8, 18, sigma, 'A', 3),
 
             # Omega Force
-            ('Brutalus', classe_id("Tanque"), 'https://imagens-herois.com/brutalus.png',
+            ('Brutalus', classe_id("Tanque"), 'https://thumbs.dreamstime.com/b/old-viking-two-handed-hammer-rock-barbarian-steel-leather-armor-two-handed-war-hammer-old-viking-186295761.jpg',
              'Muralha de Ferro, Golpe Terremoto', 20, 20, 8, omega, 'S', 1),
 
-            ('Seraphine', classe_id("Mago"), 'https://imagens-herois.com/seraphine.png',
+            ('Seraphine', classe_id("Mago"), 'https://preview.redd.it/rqbk6bgdnbn91.jpg?width=640&crop=smart&auto=webp&s=cac4dbab4d97ec43abcc56809a67b3f7c74c4f55',
              'Chama Celestial, Cura Arcana', 14, 12, 12, omega, 'A', 2),
 
-            ('Falconis', classe_id("Arqueiro"), 'https://imagens-herois.com/falconis.png',
+            ('Falconis', classe_id("Arqueiro"), 'https://www.giantbomb.com/a/uploads/square_small/0/1992/2911935-aloy.jpg',
              'Flecha Perfurante, Visão de Águia', 13, 9, 17, omega, 'B', 3),
 
             # Phantom Unit
-            ('Nightshade', classe_id("Assassino"), 'https://imagens-herois.com/nightshade.png',
+            ('Nightshade', classe_id("Assassino"), 'https://i.redd.it/dzsuxajtcpr61.jpg',
              'Lâmina Sombria, Invisibilidade', 15, 10, 19, phantom, 'S', 1),
 
-            ('Thalos', classe_id("Guerreiro"), 'https://imagens-herois.com/thalos.png',
+            ('Thalos', classe_id("Guerreiro"), 'https://thumbs.dreamstime.com/b/character-cartoon-illustration-male-fantasy-warrior-sword-shotgun-design-hunter-82031423.jpg',
              'Golpe Fúria, Defesa Bruta', 17, 16, 11, phantom, 'A', 2),
 
-            ('Arcwyn', classe_id("Mago"), 'https://imagens-herois.com/arcwyn.png',
+            ('Arcwyn', classe_id("Mago"), 'https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcR5mPBEOJrBesvpGqSrTggAmobVD7IsHhCiGA&s',
              'Raios Arcanos, Barreira Mística', 14, 13, 14, phantom, 'A', 3),
         ]
 
@@ -490,7 +487,7 @@ def listar_classes():
     cursor.close()
     conn.close()
     
-    return render_template('classes.html', classes=classes, tipo=session["tipo_usuario"])
+    return render_template('classes.html', classes=classes, tipo = session.get('tipo_usuario'))
 
 # endregion
 
@@ -1158,6 +1155,5 @@ if __name__ == '__main__':
 # ._____ ____._______
 #(  .       (
 # '-'        '
-
 
 
