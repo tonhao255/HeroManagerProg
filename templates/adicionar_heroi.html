@@ -43,7 +43,7 @@
             {% endfor %}
         </select>
     </div>
-
+    {% if admin %}
     <div class="mb-3">
         <label>Time</label>
         <select class="form-select" name="id_time">
@@ -53,7 +53,8 @@
             {% endfor %}
         </select>
     </div>
-
+    {% endif %}
+ 
     <button class="btn btn-success">Salvar</button>
 </form>
 

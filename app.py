@@ -40,7 +40,7 @@ from datetime import datetime
 #/  __   \    `;
 # .' .'  /,   ,¨'-
 #/'.___.'__'__'._____('________ ____
-#
+#u
 # region CONFIGURAÇÃO
 
 app = Flask(__name__)
@@ -50,8 +50,8 @@ db_config = {
     'host': 'localhost',
     'user': 'root',
     'password': '',
-    'database': 'sistema_herois',
-    'port': 3307
+    'database': '',
+    'port': 3306
 }
 
 def get_connection():
@@ -67,7 +67,7 @@ def inject_now():
     return {'now': datetime.now}
 
 def setup_database():
-    try:
+    # try:
         # ===============================
         # 1. Conectar ao MySQL sem banco
         # ===============================
@@ -78,12 +78,15 @@ def setup_database():
         if cursor.fetchone():
             cursor.close()
             conn.close()
+            db_config['database'] = 'sistema_herois'
             return
 
         print("\n→ Criando banco de dados...")
         cursor.execute("DROP DATABASE IF EXISTS sistema_herois;")
         cursor.execute("CREATE DATABASE sistema_herois;")
         cursor.execute("USE sistema_herois;")
+        
+        db_config['database'] = 'sistema_herois'
 
         # ===============================
         # 2. Criação das tabelas
@@ -271,10 +274,12 @@ def setup_database():
 
         print("\n✔ Banco criado e populado com sucesso!")
 
-    except Error as e:
-        print("❌ Erro:", e)
+    # except Error as e:
+    #     print("❌ Erro:", e)
 
-setup_database()
+# setup_database()
+
+
 
 # endregion
 # ._____ ____._______
@@ -709,7 +714,7 @@ def adicionar_heroi():
 
     cursor.close()
     conn.close()
-    return render_template('adicionar_heroi.html', form=form, classes=classes, times=times)
+    return render_template('adicionar_heroi.html', form=form, classes=classes, times=times, admin=tipo_usuario=="ADMIN")
 
 @app.route('/heroi/<int:id_heroi>/editar', methods=['GET', 'POST'])
 @hero_required
@@ -787,7 +792,7 @@ def editar_heroi(id_heroi):
 
     cursor.close()
     conn.close()
-    return render_template('editar_heroi.html', form=form, classes=classes, times=times)
+    return render_template('editar_heroi.html', form=form, classes=classes, times=times, admin=tipo_usuario=="ADMIN")
 
 @app.route('/heroi/<int:id_heroi>/excluir', methods=['GET', 'POST'])
 @hero_required
@@ -869,7 +874,7 @@ def editar_time(id_time):
 
     cursor.close()
     conn.close()
-    return render_template('editar_heroi.html', form=form)
+    return render_template('editar_heroi.html', form=form, admin=tipo_usuario=="ADMIN")
 
 @app.route('/time/<int:id_time>/excluir', methods=['POST'])
 @team_required
@@ -1149,7 +1154,9 @@ def excluir_classe(id_classe):
 # region EXECUÇÃO
 
 if __name__ == '__main__':
+    setup_database() 
     app.run(debug=True)
+    
 
 # endregion
 # ._____ ____._______
