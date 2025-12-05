@@ -35,5 +35,6 @@ python app.py
 ```
 
 login do admin para testes:
-admin@sistema.Com
+admin@sistema.com
+
 admin123
