@@ -1,3 +1,6 @@
 Erros 2025/12/04: 
 
-Erro 3: No caminho "http://127.0.0.1:5000/heroi/novo"(criar herios) não é possivel escolher o time dele
+Editar o nome do usuario pela tela inicial, não atualiza o nome mostrado na tela
+Quando olho para a tela de classes vejo somente fezes
+Classe não aparece na tela de editar time
+
