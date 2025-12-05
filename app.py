@@ -40,7 +40,7 @@ from datetime import datetime
 #/  __   \    `;
 # .' .'  /,   ,¨'-
 #/'.___.'__'__'._____('________ ____
-#u
+#
 # region CONFIGURAÇÃO
 
 app = Flask(__name__)
@@ -401,6 +401,7 @@ def listar_herois():
             h.forca,
             h.defesa,
             h.velocidade,
+            h.id_time,
             h.imagem_url,
             h.rank,
             h.posicao,
@@ -413,7 +414,7 @@ def listar_herois():
     herois = cursor.fetchall()
     cursor.close()
     conn.close()
-    return render_template('herois.html', herois=herois)
+    return render_template('herois.html', herois=herois, user=(session.get("tipo_usuario") or "USER"))
 
 @app.route('/heroi/<int:id_heroi>', methods=['GET'])
 def ver_heroi(id_heroi):
@@ -435,7 +436,7 @@ def ver_heroi(id_heroi):
     cursor.close()
     conn.close()
 
-    return render_template('ver_heroi.html', heroi=heroi)
+    return render_template('ver_heroi.html', heroi=heroi, user=(session.get("tipo_usuario") or "USER"))
 
 
 # endregion
@@ -463,7 +464,7 @@ def listar_times():
     cursor.close()
     conn.close()
 
-    return render_template('times.html', times=times)
+    return render_template('times.html', times=times, user=(session.get("tipo_usuario") or "USER"))
 
 @app.route('/time/<int:id_time>', methods=['GET'])
 def ver_time(id_time):
@@ -475,7 +476,7 @@ def ver_time(id_time):
     herois = cursor.fetchall()
     cursor.close()
     conn.close()
-    return render_template('ver_time.html', time=time, herois=herois)
+    return render_template('ver_time.html', time=time, herois=herois, user=(session.get("tipo_usuario") or "USER"))
 
 # endregion
 
@@ -684,7 +685,8 @@ def adicionar_heroi():
         if tipo_usuario == 'ADMIN':
             form['id_time'] = request.form['id_time']
         else:
-            form['id_time'] = session.get('id_time')
+            cursor.execute("SELECT id_time FROM times WHERE id_usuario = %s", (session.get("id_usuario"),))
+            form['id_time'] = cursor.fetchone()["id_time"]
 
         cursor.execute("SELECT id_heroi FROM herois WHERE nome_heroi = %s", (form['nome_heroi'],))
         if cursor.fetchone():
@@ -855,7 +857,7 @@ def editar_time(id_time):
 
         cursor.execute("""
             SELECT id_time FROM times WHERE nome_time = %s AND id_time <> %s""",
-            (form['nome_heroi'], id_time)
+            (form['nome_time'], id_time)
         )
         if cursor.fetchone():
             flash("Já existe um time com esse nome!", "warning")
@@ -874,7 +876,7 @@ def editar_time(id_time):
 
     cursor.close()
     conn.close()
-    return render_template('editar_heroi.html', form=form, admin=tipo_usuario=="ADMIN")
+    return render_template('editar_time.html', form=form, admin=tipo_usuario=="ADMIN")
 
 @app.route('/time/<int:id_time>/excluir', methods=['POST'])
 @team_required

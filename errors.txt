@@ -1,5 +1,3 @@
 Erros 2025/12/04: 
 
-Erro 1: No caminho "http://127.0.0.1:5000/times" o botão "editar time" está editando herois
-Erro 2: No caminho "http://127.0.0.1:5000/times/5"(caminho do seu time) o botão "editar time" está editando herois tambem
 Erro 3: No caminho "http://127.0.0.1:5000/heroi/novo"(criar herios) não é possivel escolher o time dele

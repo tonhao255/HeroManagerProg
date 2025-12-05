@@ -4,7 +4,9 @@
 
 <h2 class="mb-4">Heróis</h2>
 
+{% if user == "ADMIN" %}
 <a href="{{ url_for('adicionar_heroi') }}" class="btn btn-success mb-3">Adicionar Herói</a>
+{% endif %}
 
 <table class="table table-striped">
     <thead>
@@ -28,6 +30,7 @@
             <td>{{ h.rank }}</td>
             <td>
                 <a href="{{ url_for('ver_heroi', id_heroi=h.id_heroi) }}" class="btn btn-primary btn-sm">Ver</a>
+                {% if user == "ADMIN"%}
                 <a href="{{ url_for('editar_heroi', id_heroi=h.id_heroi) }}" class="btn btn-warning btn-sm">Editar</a>
 
                 <form method="POST"
@@ -36,6 +39,7 @@
                       onsubmit="return confirm('Tem certeza que deseja excluir este herói?')">
                     <button class="btn btn-danger btn-sm">Excluir</button>
                 </form>
+                {% endif %}
             </td>
         </tr>
         {% endfor %}

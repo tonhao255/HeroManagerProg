@@ -20,6 +20,7 @@
             <td>
                 <a href="{{ url_for('ver_time', id_time=t.id_time) }}" class="btn btn-primary btn-sm">Ver</a>
 
+                {% if user != "USER" %}
                 <a href="{{ url_for('editar_time', id_time=t.id_time) }}" class="btn btn-warning btn-sm">Editar Time</a>
 
                 <form method="POST" action="{{ url_for('excluir_time', id_time=t.id_time) }}"
@@ -27,6 +28,7 @@
                       onsubmit="return confirm('Excluir time?')">
                     <button class="btn btn-danger btn-sm">Excluir</button>
                 </form>
+                {% endif %}
             </td>
         </tr>
         {% endfor %}

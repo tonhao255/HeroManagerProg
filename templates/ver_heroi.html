@@ -171,7 +171,9 @@
 </div>
 
 <div class="mt-4">
+    {% if user != "USER" %}
     <a href="{{ url_for('editar_heroi', id_heroi=heroi.id_heroi) }}" class="btn btn-warning">Editar</a>
+    {% endif %}
     <a href="{{ url_for('listar_herois') }}" class="btn btn-secondary">Voltar</a>
 </div>
 

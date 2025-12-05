@@ -34,3 +34,6 @@ apache e mysql porta 3306
 python app.py
 ```
 
+login do admin para testes:
+admin@sistema.Com
+admin123

@@ -5,12 +5,12 @@
 <form method="post">
     <div class="mb-3">
         <label class="form-label">Nome</label>
-        <input type="text" name="nome_time" class="form-control" value="{{ time.nome_time }}" required>
+        <input type="text" name="nome_time" class="form-control" value="{{ form.nome_time }}" required>
     </div>
 
     <div class="mb-3">
         <label class="form-label">Descrição</label>
-        <textarea name="descricao" class="form-control">{{ time.descricao }}</textarea>
+        <textarea name="descricao" class="form-control">{{ form.descricao }}</textarea>
     </div>
 
     <button class="btn btn-primary">Salvar</button>

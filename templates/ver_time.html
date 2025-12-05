@@ -7,7 +7,9 @@
 
 <h4 class="mt-4">Heróis do Time</h4>
 
+{% if user != "USER" %}
 <a href="{{ url_for('adicionar_heroi') }}" class="btn btn-success mb-3">Adicionar Herói</a>
+{% endif %}
 
 {% if herois %}
 <table class="table table-striped">
@@ -32,6 +34,7 @@
             <td>{{ heroi.rank }}</td>
             <td>
                 <a href="{{ url_for('ver_heroi', id_heroi=heroi.id_heroi) }}" class="btn btn-primary btn-sm">Ver</a>
+                {% if user != "USER" %}
                 <a href="{{ url_for('editar_heroi', id_heroi=heroi.id_heroi) }}" class="btn btn-warning btn-sm">Editar</a>
 
                 <form method="POST"
@@ -40,6 +43,7 @@
                       onsubmit="return confirm('Tem certeza que deseja excluir este herói?')">
                     <button class="btn btn-danger btn-sm">Excluir</button>
                 </form>
+                {% endif %}
             </td>
         </tr>
         {% endfor %}
@@ -49,12 +53,14 @@
 <p class="text-muted">Nenhum herói neste time.</p>
 {% endif %}
 
+{% if user != "USER" %}
 <a href="{{ url_for('editar_time', id_time=time.id_time) }}" class="btn btn-warning">Editar Time</a>
 
 <form action="{{ url_for('excluir_time', id_time=time.id_time) }}" method="post" class="d-inline"
       onsubmit="return confirm('Excluir este time permanentemente?');">
     <button class="btn btn-danger">Excluir Time</button>
 </form>
+{% endif %}
 
 <a href="{{ url_for('listar_times') }}" class="btn btn-secondary">Voltar</a>
 
