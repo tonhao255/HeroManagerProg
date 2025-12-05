@@ -4,6 +4,8 @@ Alunos: Lucas Salvador, Antonio Henrique Rohling Froehner
 
 Na pasta `HeroManagerProg`, execute:
 
+## 1. Configurar Ambiente Virtual
+
 Windows:
 ```
 python -m venv .venv
@@ -31,3 +33,4 @@ apache e mysql porta 3306
 ```
 python app.py
 ```
+
