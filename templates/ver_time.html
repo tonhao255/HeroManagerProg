@@ -1,0 +1,67 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<h2>{{ time.nome_time }}</h2>
+
+<p><strong>Descrição:</strong> {{ time.descricao }}</p>
+
+<h4 class="mt-4">Heróis do Time</h4>
+
+{% if user == "ADMIN" or mesmo_time %}
+<a href="{{ url_for('adicionar_heroi') }}" class="btn btn-success mb-3">Adicionar Herói</a>
+{% endif %}
+
+{% if herois %}
+<table class="table table-striped">
+    <thead>
+        <tr>
+            <th>Foto</th>
+            <th>Nome</th>
+            <th>Classe</th>
+            <th>Rank</th>
+            <th>Opções</th>
+        </tr>
+    </thead>
+    <tbody>
+        {% for heroi in herois %}
+        <tr>
+            <td>
+                <img src="{{ heroi.imagem_url }}" 
+                     style="max-width: 40px; max-height: 40px; object-fit: cover; border-radius: 4px;">
+            </td>
+            <td>{{ heroi.nome_heroi }}</td>
+            <td>{{ heroi.nome_classe }}</td>
+            <td>{{ heroi.rank }}</td>
+            <td>
+                <a href="{{ url_for('ver_heroi', id_heroi=heroi.id_heroi) }}" class="btn btn-primary btn-sm">Ver</a>
+                {% if user == "ADMIN" or mesmo_time %}
+                <a href="{{ url_for('editar_heroi', id_heroi=heroi.id_heroi) }}" class="btn btn-warning btn-sm">Editar</a>
+
+                <form method="POST"
+                      action="{{ url_for('excluir_heroi', id_heroi=heroi.id_heroi) }}"
+                      style="display:inline"
+                      onsubmit="return confirm('Tem certeza que deseja excluir este herói?')">
+                    <button class="btn btn-danger btn-sm">Excluir</button>
+                </form>
+                {% endif %}
+            </td>
+        </tr>
+        {% endfor %}
+    </tbody>
+</table>
+{% else %}
+<p class="text-muted">Nenhum herói neste time.</p>
+{% endif %}
+
+{% if user == "ADMIN" or mesmo_time %}
+<a href="{{ url_for('editar_time', id_time=time.id_time) }}" class="btn btn-warning">Editar Time</a>
+
+<form action="{{ url_for('excluir_time', id_time=time.id_time) }}" method="post" class="d-inline"
+      onsubmit="return confirm('Excluir este time permanentemente?');">
+    <button class="btn btn-danger">Excluir Time</button>
+</form>
+{% endif %}
+
+<a href="{{ url_for('listar_times') }}" class="btn btn-secondary">Voltar</a>
+
+{% endblock %}

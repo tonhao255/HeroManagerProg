@@ -1,0 +1,14 @@
+{% extends "base.html" %}
+{% block title %}Início{% endblock %}
+{% block content %}
+<h1 class="mb-4">Bem-vindo ao Heroes Association</h1>
+
+<p class="lead">Gerencie heróis, times e classes.</p>
+
+{% if session.get("id_usuario") %}
+<a href="{{ url_for('listar_herois') }}" class="btn btn-primary">Ver Heróis</a>
+{% else %}
+<a href="{{ url_for('login') }}" class="btn btn-primary">Entrar</a>
+<a href="{{ url_for('cadastro') }}" class="btn btn-secondary">Registrar</a>
+{% endif %}
+{% endblock %}

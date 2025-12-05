@@ -1,0 +1,49 @@
+{% extends "base.html" %}
+{% block title %}Heróis{% endblock %}
+{% block content %}
+
+<h2 class="mb-4">Heróis</h2>
+
+{% if user == "ADMIN" %}
+<a href="{{ url_for('adicionar_heroi') }}" class="btn btn-success mb-3">Adicionar Herói</a>
+{% endif %}
+
+<table class="table table-striped">
+    <thead>
+        <tr><th>Foto</th>
+            <th>Nome</th>
+            <th>Classe</th>
+            <th>Time</th>
+            <th>Rank</th>
+            <th></th>
+        </tr>
+    </thead>
+    <tbody>
+        {% for h in herois %}
+        <tr>
+            <td><img src="{{ h.imagem_url }}" 
+                style="max-width: 40px; max-height: 40px; object-fit: cover; border-radius: 4px;">
+            </td>
+            <td>{{ h.nome_heroi }}</td>
+            <td>{{ h.classe }}</td>
+            <td>{{ h.time }}</td>
+            <td>{{ h.rank }}</td>
+            <td>
+                <a href="{{ url_for('ver_heroi', id_heroi=h.id_heroi) }}" class="btn btn-primary btn-sm">Ver</a>
+                {% if user == "ADMIN"%}
+                <a href="{{ url_for('editar_heroi', id_heroi=h.id_heroi) }}" class="btn btn-warning btn-sm">Editar</a>
+
+                <form method="POST"
+                      action="{{ url_for('excluir_heroi', id_heroi=h.id_heroi) }}"
+                      style="display:inline"
+                      onsubmit="return confirm('Tem certeza que deseja excluir este herói?')">
+                    <button class="btn btn-danger btn-sm">Excluir</button>
+                </form>
+                {% endif %}
+            </td>
+        </tr>
+        {% endfor %}
+    </tbody>
+</table>
+
+{% endblock %}

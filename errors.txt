@@ -1,3 +1,8 @@
-Sem login: link classes
-times > ver > criado por:???????
-Aparecer admin/time + nome.user
+Erros 2025/12/04: 
+
+corrigido: Editar o nome do usuario pela tela inicial, não atualiza o nome mostrado na tela
+corrigido: Quando olho para a tela de classes vejo somente fezes
+corrigido: Classe não aparece na tela de editar time
+
+correção bonus: erro ao editar heroi
+bonus: 

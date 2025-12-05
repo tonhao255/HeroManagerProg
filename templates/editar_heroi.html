@@ -1,0 +1,136 @@
+{% extends 'base.html' %}
+{% block content %}
+
+<h2>Editar Herói</h2>
+
+<form method="post">
+
+    <!-- Nome -->
+    <div class="mb-3">
+        <label class="form-label">Nome</label>
+        <input
+            type="text"
+            name="nome_heroi"
+            value="{{ form.nome_heroi }}"
+            class="form-control"
+            required
+        >
+    </div>
+
+    <!-- URL da Imagem -->
+    <div class="mb-3">
+        <label class="form-label">URL da Imagem</label>
+        <input
+            type="url"
+            name="imagem_url"
+            class="form-control"
+            value="{{ form.imagem_url }}"
+        >
+    </div>
+
+    <!-- Habilidades -->
+    <div class="mb-3">
+        <label class="form-label">Habilidades</label>
+        <textarea
+            name="habilidades"
+            class="form-control"
+            rows="4"
+        >{{ form.habilidades }}</textarea>
+    </div>
+
+    <!-- Atributos -->
+    <div class="row">
+        <div class="col">
+            <label class="form-label">Força</label>
+            <input
+                type="number"
+                name="forca"
+                class="form-control"
+                value="{{ form.forca }}"
+                required
+            >
+        </div>
+
+        <div class="col">
+            <label class="form-label">Defesa</label>
+            <input
+                type="number"
+                name="defesa"
+                class="form-control"
+                value="{{ form.defesa }}"
+                required
+            >
+        </div>
+
+        <div class="col">
+            <label class="form-label">Velocidade</label>
+            <input
+                type="number"
+                name="velocidade"
+                class="form-control"
+                value="{{ form.velocidade }}"
+                required
+            >
+        </div>
+    </div>
+
+    <!-- Classe & Time -->
+    <div class="row mt-3">
+
+        <!-- Classe -->
+        <div class="col">
+            <label class="form-label">Classe</label>
+            <select name="id_classe" class="form-select">
+                {% for classe in classes %}
+                <option
+                    value="{{ classe.id_classe }}"
+                    {% if classe.id_classe == form.id_classe %}selected{% endif %}
+                >
+                    {{ classe.nome_classe }}
+                </option>
+                {% endfor %}
+            </select>
+        </div>
+
+        <!-- Time (só aparece se houver lista) -->
+        {% if times and admin%}
+        <div class="col">
+            <label class="form-label">Time</label>
+            <select name="id_time" class="form-select">
+                {% for time in times %}
+                <option
+                    value="{{ time.id_time }}"
+                    {% if time.id_time == form.id_time %}selected{% endif %}
+                >
+                    {{ time.nome_time }}
+                </option>
+                {% endfor %}
+            </select>
+        </div>
+        {% endif %}
+
+    </div>
+
+    <!-- Rank (apenas admin) -->
+    {% if session.tipo_usuario == 'ADMIN' %}
+    <div class="mt-3">
+        <label class="form-label">Rank</label>
+        <select name="rank" class="form-select">
+            {% for r in ['S','A','B','C','D'] %}
+            <option value="{{ r }}" {% if r == form.rank %}selected{% endif %}>
+                {{ r }}
+            </option>
+            {% endfor %}
+        </select>
+    </div>
+    {% endif %}
+
+    <!-- Botões -->
+    <div class="mt-4">
+        <button class="btn btn-primary">Salvar Alterações</button>
+        <a href="{{ url_for('listar_herois') }}" class="btn btn-secondary">Cancelar</a>
+    </div>
+
+</form>
+
+{% endblock %}

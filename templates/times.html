@@ -1,0 +1,38 @@
+{% extends "base.html" %}
+{% block title %}Times{% endblock %}
+{% block content %}
+
+<h2 class="mb-4">Times</h2>
+
+<table class="table table-striped">
+    <thead>
+        <tr>
+            <th>Nome</th>
+            <th>Descrição</th>
+            <th></th>
+        </tr>
+    </thead>
+    <tbody>
+        {% for t in times %}
+        <tr>
+            <td>{{ t.nome_time }}</td>
+            <td>{{ t.descricao }}</td>
+            <td>
+                <a href="{{ url_for('ver_time', id_time=t.id_time) }}" class="btn btn-primary btn-sm">Ver</a>
+
+                {% if user != "USER" %}
+                <a href="{{ url_for('editar_time', id_time=t.id_time) }}" class="btn btn-warning btn-sm">Editar Time</a>
+
+                <form method="POST" action="{{ url_for('excluir_time', id_time=t.id_time) }}"
+                      style="display:inline"
+                      onsubmit="return confirm('Excluir time?')">
+                    <button class="btn btn-danger btn-sm">Excluir</button>
+                </form>
+                {% endif %}
+            </td>
+        </tr>
+        {% endfor %}
+    </tbody>
+</table>
+
+{% endblock %}

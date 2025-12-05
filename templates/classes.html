@@ -1,0 +1,47 @@
+{% extends 'base.html' %}
+{% block content %}
+
+<h2>Classes</h2>
+
+{% if tipo == 'ADMIN' %}
+    <a href="{{ url_for('adicionar_classe') }}" class="btn btn-success mb-3">
+        + Adicionar Classe
+    </a>
+{% endif %}
+
+<table class="table table-striped">
+    <thead>
+        <tr>
+            <th>ID</th>
+            <th>Nome</th>
+            <th>Descrição</th>
+            {% if tipo == 'ADMIN' %}
+                <th>Ações</th>
+            {% endif %}
+        </tr>
+    </thead>
+    <tbody>
+        {% for classe in classes %}
+        <tr>
+            <td>{{ classe.id_classe }}</td>
+            <td>{{ classe.nome_classe }}</td>
+            <td>{{ classe.descricao }}</td>
+
+            {% if tipo == 'ADMIN' %}
+            <td>
+                <a href="{{ url_for('editar_classe', id_classe=classe.id_classe) }}" class="btn btn-primary btn-sm">
+                    Editar
+                </a>
+
+                <form action="{{ url_for('excluir_classe', id_classe=classe.id_classe) }}" method="POST" style="display:inline;"
+                      onsubmit="return confirm('Tem certeza que deseja excluir esta classe?');">
+                    <button class="btn btn-danger btn-sm">Excluir</button>
+                </form>
+            </td>
+            {% endif %}
+        </tr>
+        {% endfor %}
+    </tbody>
+</table>
+
+{% endblock %}
